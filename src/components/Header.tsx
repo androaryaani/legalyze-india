@@ -6,9 +6,11 @@ interface HeaderProps {
   setLanguage: (lang: 'en' | 'hi') => void;
   t: any;
   isLoggedIn: boolean;
+  userType?: 'main' | 'user' | 'admin' | 'lawyer';
+  onLogout?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn }) => {
+const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn, userType = 'main', onLogout }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -37,12 +39,7 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn })
           <img 
             src="/Screenshot_2025-07-29_184828-removebg-preview copy.png" 
             alt="Legalyze-India Logo" 
-            className="w-10 h-10"
-          />
-          <img 
-            src="/Screenshot_2025-07-29_184828-removebg-preview copy.png" 
-            alt="Legalyze-India Logo" 
-            className="w-10 h-10"
+            className="w-14 h-14"
           />
           <div>
             <h1 className="text-2xl font-bold font-serif text-black">
@@ -68,15 +65,39 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn })
         </nav>
 
         <div className="flex items-center space-x-2">
-          {isLoggedIn && (
-            <button className="hidden lg:block bg-black text-white px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all">
-              {t.header.dashboard}
-            </button>
-          )}
+          <div className="hidden lg:flex space-x-2">
+            {isLoggedIn ? (
+              <>
+                <span className="text-black px-4 py-2 rounded text-sm font-sans">
+                  {userType === 'user' ? 'User' : userType === 'admin' ? 'Admin' : 'Lawyer'}
+                </span>
+                <button 
+                  onClick={onLogout} 
+                  className="bg-black text-white px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="bg-black text-white px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all inline-block">
+                  Sign In
+                </a>
+                <a href="/signup" className="border border-black text-black px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all inline-block">
+                  Sign Up
+                </a>
+              </>
+            )}
+          </div>
           <Globe className="w-4 h-4 text-black" />
           <select
             value={language}
-            onChange={(e) => setLanguage(e.target.value as 'en' | 'hi')}
+            onChange={(e) => {
+              const newLang = e.target.value as 'en' | 'hi';
+              // Save language preference to localStorage
+              localStorage.setItem('language', newLang);
+              setLanguage(newLang);
+            }}
             className="bg-transparent border border-black text-black px-3 py-1 rounded text-sm font-sans focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="en">English</option>
@@ -107,11 +128,30 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn })
                 {item.label}
               </a>
             ))}
-            {isLoggedIn && (
-              <button className="w-full bg-black text-white px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all">
-                {t.header.dashboard}
-              </button>
-            )}
+            <div className="space-y-2">
+              {isLoggedIn ? (
+                <>
+                  <span className="block text-black px-4 py-2 text-sm font-sans">
+                    {userType === 'user' ? 'User' : userType === 'admin' ? 'Admin' : 'Lawyer'}
+                  </span>
+                  <button 
+                    onClick={onLogout} 
+                    className="w-full bg-black text-white px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <a href="/login" className="block w-full bg-black text-white px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all text-center">
+                    Sign In
+                  </a>
+                  <a href="/signup" className="block w-full border border-black text-black px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all text-center">
+                    Sign Up
+                  </a>
+                </>
+              )}
+            </div>
           </nav>
         </div>
       )}
@@ -119,4 +159,4 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn })
   );
 };
 
-export default Header;
+export { Header };

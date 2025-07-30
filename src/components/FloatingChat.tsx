@@ -3,18 +3,29 @@ import { MessageSquare, X, Send } from 'lucide-react';
 
 interface FloatingChatProps {
   t: any;
-  showToast: (message: string) => void;
+  showToast?: (message: string) => void;
+  userType?: 'main' | 'user' | 'admin' | 'lawyer';
 }
 
-const FloatingChat: React.FC<FloatingChatProps> = ({ t, showToast }) => {
+const FloatingChat: React.FC<FloatingChatProps> = ({ t, showToast, userType = 'main' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState([
-    { 
-      role: 'assistant', 
-      content: t.chat.welcome + "\n\n🤝 मैं आपकी पूरी legal history और documents को समझता हूं। DigiLocker से आपके documents भी fetch कर सकता हूं।" 
+  const [chatHistory, setChatHistory] = useState(() => {
+    // Different welcome messages based on user type
+    let welcomeMessage = t.chat.welcome;
+    
+    if (userType === 'user') {
+      welcomeMessage += "\n\n🤝 I understand your complete legal history and documents. I can also fetch your documents from DigiLocker.";
+    } else if (userType === 'lawyer') {
+      welcomeMessage += "\n\n🤝 As a lawyer, I can help you with case and client management. Legal documents and templates are also available.";
+    } else if (userType === 'admin') {
+      welcomeMessage += "\n\n🤝 As an admin, I can help you with platform management, user data, and system updates.";
+    } else {
+      welcomeMessage += "\n\n🤝 I can provide you with legal advice and guidance. Login for more features.";
     }
-  ]);
+    
+    return [{ role: 'assistant', content: welcomeMessage }];
+  });
 
   const handleSendMessage = () => {
     if (message.trim()) {
@@ -22,82 +33,93 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ t, showToast }) => {
       const newUserMessage = { role: 'user', content: message };
       setChatHistory(prev => [...prev, newUserMessage]);
       
-      // Simulate AI response
+      // Simulate AI response based on user type
       setTimeout(() => {
-        // Simulate intelligent case analysis
-        const isStrongCase = message.toLowerCase().includes('court') || 
-                           message.toLowerCase().includes('lawyer') || 
-                           message.toLowerCase().includes('case');
-        
         let aiResponse;
-        if (isStrongCase) {
+        
+        // Different responses based on user type
+        if (userType === 'user') {
+          // Simulate intelligent case analysis for regular users
+          const isStrongCase = message.toLowerCase().includes('court') || 
+                             message.toLowerCase().includes('lawyer') || 
+                             message.toLowerCase().includes('case');
+          
+          if (isStrongCase) {
+            aiResponse = {
+              role: 'assistant',
+              content: `${t.chat.aiResponse} "${message}". 
+              
+              🔍 **Case Analysis**: Your case appears to be strong. 
+              
+              📋 **My Advice**: 
+              1. First, I'll give you basic guidance
+              2. If the case is complex, it would be better to talk to a verified lawyer
+              
+              💡 **Next Steps**: Would you like me to connect you with a lawyer?
+              
+              🔒 **Privacy**: All your information is secure.`
+            };
+          } else {
+            aiResponse = {
+              role: 'assistant',
+              content: `${t.chat.aiHelp} 
+              
+              📝 **Understood**: "${message}"
+              
+              🎯 **My analysis**: This is a general legal query. I can guide you step-by-step.
+              
+              📚 **Available Acts**: I have complete information about Indian legal acts.
+              
+              💬 **Keep talking**: If you have any doubts, please ask, I'm here!`
+            };
+          }
+        } else if (userType === 'lawyer') {
+          // Lawyer-specific responses
           aiResponse = {
             role: 'assistant',
-            content: `${t.chat.aiResponse} "${message}". 
+            content: `Thank you for your question "${message}".
             
-            🔍 **Case Analysis**: आपका case strong लग रहा है। 
+            👨‍⚖️ **Lawyer Specific Information**: 
+            - You have ${Math.floor(Math.random() * 5) + 1} new case updates
+            - ${Math.floor(Math.random() * 3) + 2} clients have requested consultation with you
             
-            📋 **मेरी सलाह**: 
-            1. पहले मैं आपको basic guidance दूंगा
-            2. अगर case complex है तो verified lawyer से बात करना बेहतर होगा
+            📄 **Available Templates**: ${Math.floor(Math.random() * 10) + 5} new templates related to your field have been added
             
-            💡 **Next Steps**: क्या आप चाहते हैं कि मैं आपको lawyer connect करूं?
+            📊 **Case Statistics**: Your success rate is ${Math.floor(Math.random() * 20) + 80}%`
+          };
+        } else if (userType === 'admin') {
+          // Admin-specific responses
+          aiResponse = {
+            role: 'assistant',
+            content: `Thank you for your question "${message}", Admin.
             
-            🔒 **Privacy**: आपकी सारी जानकारी secure है।`
+            👨‍💼 **Platform Statistics**: 
+            - ${Math.floor(Math.random() * 50) + 100} new users this week
+            - ${Math.floor(Math.random() * 200) + 300} new case queries
+            - ${Math.floor(Math.random() * 20) + 30} new lawyer registrations
+            
+            🔧 **System Status**: All systems are functioning normally
+            
+            📈 **Analytics**: User engagement has increased by ${Math.floor(Math.random() * 20) + 5}% since last month`
           };
         } else {
+          // Default response for non-logged in users
           aiResponse = {
             role: 'assistant',
-            content: `${t.chat.aiHelp} 
+            content: `Thank you for your question "${message}".
             
-            📝 **समझ गया**: "${message}"
+            ℹ️ **Information**: I can provide you with basic legal information.
             
-            🎯 **मेरा analysis**: यह एक सामान्य legal query है। मैं आपको step-by-step guide कर सकता हूं।
+            🔐 **More Features**: For more features like personalized legal assistance and DigiLocker integration, please login or sign up.
             
-            📚 **Available Acts**: मेरे पास Indian legal acts की पूरी जानकारी है।
-            
-            💬 **बात करते रहिए**: कोई भी doubt हो तो पूछिए, मैं यहीं हूं!`
-          };
-        }
-        
-        // Simulate intelligent case analysis
-        const isStrongCase = message.toLowerCase().includes('court') || 
-                           message.toLowerCase().includes('lawyer') || 
-                           message.toLowerCase().includes('case');
-        
-        let aiResponse;
-        if (isStrongCase) {
-          aiResponse = {
-            role: 'assistant',
-            content: `${t.chat.aiResponse} "${message}". 
-            
-            🔍 **Case Analysis**: आपका case strong लग रहा है। 
-            
-            📋 **मेरी सलाह**: 
-            1. पहले मैं आपको basic guidance दूंगा
-            2. अगर case complex है तो verified lawyer से बात करना बेहतर होगा
-            
-            💡 **Next Steps**: क्या आप चाहते हैं कि मैं आपको lawyer connect करूं?
-            
-            🔒 **Privacy**: आपकी सारी जानकारी secure है।`
-          };
-        } else {
-          aiResponse = {
-            role: 'assistant',
-            content: `${t.chat.aiHelp} 
-            
-            📝 **समझ गया**: "${message}"
-            
-            🎯 **मेरा analysis**: यह एक सामान्य legal query है। मैं आपको step-by-step guide कर सकता हूं।
-            
-            📚 **Available Acts**: मेरे पास Indian legal acts की पूरी जानकारी है।
-            
-            💬 **बात करते रहिए**: कोई भी doubt हो तो पूछिए, मैं यहीं हूं!`
+            💡 **Suggestion**: Could you provide more details about your legal question?`
           };
         }
         
         setChatHistory(prev => [...prev, aiResponse]);
-        showToast(t.chat.responseReceived);
+        if (showToast) {
+          showToast(t.chat.responseReceived);
+        }
       }, 1000);
       
       setMessage('');
@@ -180,4 +202,5 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ t, showToast }) => {
   );
 };
 
+export { FloatingChat };
 export default FloatingChat;

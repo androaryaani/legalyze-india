@@ -44,4 +44,5 @@ const CookieConsent: React.FC<CookieConsentProps> = ({ t, onAccept }) => {
   );
 };
 
+export { CookieConsent };
 export default CookieConsent;

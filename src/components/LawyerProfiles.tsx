@@ -228,4 +228,5 @@ const LawyerProfiles: React.FC<LawyerProfilesProps> = ({ t }) => {
   );
 };
 
+export { LawyerProfiles };
 export default LawyerProfiles;

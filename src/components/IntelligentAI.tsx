@@ -4,9 +4,10 @@ import { Brain, User, FileText, Scale, AlertTriangle, CheckCircle } from 'lucide
 interface IntelligentAIProps {
   t: any;
   isLoggedIn: boolean;
+  userType?: 'main' | 'user' | 'admin' | 'lawyer';
 }
 
-const IntelligentAI: React.FC<IntelligentAIProps> = ({ t, isLoggedIn }) => {
+const IntelligentAI: React.FC<IntelligentAIProps> = ({ t, isLoggedIn, userType = 'user' }) => {
   const [userProfile] = useState({
     name: "राहुल शर्मा",
     location: "जयपुर, राजस्थान",
@@ -210,4 +211,4 @@ const IntelligentAI: React.FC<IntelligentAIProps> = ({ t, isLoggedIn }) => {
   );
 };
 
-export default IntelligentAI;
+export { IntelligentAI };

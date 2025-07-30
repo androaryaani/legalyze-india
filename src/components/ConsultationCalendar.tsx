@@ -234,4 +234,5 @@ const ConsultationCalendar: React.FC<ConsultationCalendarProps> = ({ t, isLogged
   );
 };
 
+export { ConsultationCalendar };
 export default ConsultationCalendar;

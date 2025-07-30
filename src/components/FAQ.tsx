@@ -66,4 +66,4 @@ const FAQ: React.FC<FAQProps> = ({ t }) => {
   );
 };
 
-export default FAQ;
+export { FAQ };

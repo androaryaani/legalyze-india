@@ -10,7 +10,7 @@ const VisitingCard: React.FC<VisitingCardProps> = ({ t }) => {
     <section className="py-16 px-4 bg-gradient-to-br from-gray-900 to-black">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold font-serif text-white mb-4">
+          <h2 className="text-4xl lg:text-5xl font-bold font-serif text-white mb-4">
             Meet Our Founder
           </h2>
           <p className="text-lg text-gray-300 font-sans">
@@ -75,15 +75,15 @@ const VisitingCard: React.FC<VisitingCardProps> = ({ t }) => {
           <div className="mt-8 pt-6 border-t border-gray-700">
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
-                <h5 className="text-white font-bold mb-2">🎯 Vision</h5>
+                <h5 className="text-white text-lg font-bold mb-2">Vision</h5>
                 <p className="text-gray-300 text-sm">Making legal services accessible to every Indian</p>
               </div>
               <div>
-                <h5 className="text-white font-bold mb-2">🚀 Innovation</h5>
+                <h5 className="text-white text-lg font-bold mb-2">Innovation</h5>
                 <p className="text-gray-300 text-sm">AI-powered legal solutions with human touch</p>
               </div>
               <div>
-                <h5 className="text-white font-bold mb-2">🤝 Mission</h5>
+                <h5 className="text-white text-lg font-bold mb-2">Mission</h5>
                 <p className="text-gray-300 text-sm">Bridging the gap between law and common people</p>
               </div>
             </div>
@@ -94,4 +94,5 @@ const VisitingCard: React.FC<VisitingCardProps> = ({ t }) => {
   );
 };
 
+export { VisitingCard };
 export default VisitingCard;

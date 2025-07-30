@@ -14,7 +14,7 @@ export const translations = {
     },
     hero: {
       heading: "Your Legal Bridge to Justice — AI Powered, Lawyer Verified",
-      subtext: "Draft Legal Notices, FIRs, Contracts, RTI with DigiLocker Integration — Without Confusion",
+      subtext: "Empowering Every Indian with Accessible Legal Solutions — Connecting You with Real Lawyers",
       cta: "Start Your Legal Query"
     },
     features: {
@@ -183,7 +183,8 @@ export const translations = {
       },
       contact: {
         title: "Contact & Support",
-        support: "Report a Problem"
+        support: "Report a Problem",
+        email: "lndialegalyze@gmail.com"
       },
       legal: {
         title: "Legal & Privacy",
@@ -196,7 +197,7 @@ export const translations = {
     chat: {
       title: "AI Legal Mitra",
       subtitle: "Ask me anything about law",
-      welcome: "नमस्ते दोस्त! मैं आपका AI legal मित्र हूं। आज मैं आपकी कैसे मदद कर सकता हूं? डरने की कोई बात नहीं, हम साथ में आपकी समस्या का समाधान निकालेंगे।",
+      welcome: "Hello friend! I am your AI legal assistant. How can I help you today? Don't worry, we'll solve your problem together.",
       placeholder: "Type your legal question...",
       quickQuestions: [
         "Legal notice help",
@@ -204,9 +205,189 @@ export const translations = {
         "Employment issue",
         "Consumer complaint"
       ],
-      aiResponse: "भाई, आपके सवाल के लिए धन्यवाद",
-      aiHelp: "चलिए मिलकर इस कानूनी मामले को सुलझाते हैं। मैं आपका दोस्त हूं, डरने की कोई बात नहीं।",
+      aiResponse: "Thank you for your question",
+      aiHelp: "Let's solve this legal matter together. I'm your friend, there's nothing to worry about.",
       responseReceived: "AI response received!"
+    },
+    
+    // New translations for database schema components
+    caseManagement: {
+      title: "Case Management",
+      manageCases: "Manage Cases",
+      createCase: "Create New Case",
+      myCases: "My Cases",
+      assignedCases: "Assigned Cases",
+      allCases: "All Cases",
+      caseDetails: "Case Details",
+      caseTitle: "Case Title",
+      caseDescription: "Case Description",
+      caseStatus: "Status",
+      clientName: "Client",
+      lawyerName: "Lawyer",
+      createdAt: "Created",
+      updatedAt: "Updated",
+      documents: "Documents",
+      uploadDocument: "Upload Document",
+      documentName: "Document Name",
+      documentType: "Document Type",
+      documentDescription: "Document Description",
+      uploadedBy: "Uploaded By",
+      uploadedAt: "Uploaded At",
+      download: "Download",
+      view: "View",
+      delete: "Delete",
+      submit: "Submit",
+      cancel: "Cancel",
+      save: "Save",
+      edit: "Edit",
+      close: "Close",
+      assign: "Assign Lawyer",
+      statusOptions: {
+        open: "Open",
+        in_progress: "In Progress",
+        closed: "Closed",
+        pending: "Pending Review"
+      },
+      messages: {
+        caseCreated: "Case created successfully",
+        caseUpdated: "Case updated successfully",
+        caseDeleted: "Case deleted successfully",
+        documentUploaded: "Document uploaded successfully",
+        documentDeleted: "Document deleted successfully",
+        lawyerAssigned: "Lawyer assigned successfully",
+        error: "An error occurred. Please try again."
+      }
+    },
+    
+    specializationManagement: {
+      title: "Specialization Management",
+      manageSpecializations: "Manage Specializations",
+      mySpecializations: "My Specializations",
+      allSpecializations: "All Specializations",
+      addSpecialization: "Add Specialization",
+      specializationName: "Specialization Name",
+      specializationDescription: "Description",
+      createdAt: "Created",
+      actions: "Actions",
+      submit: "Submit",
+      cancel: "Cancel",
+      save: "Save",
+      edit: "Edit",
+      delete: "Delete",
+      messages: {
+        specializationAdded: "Specialization added successfully",
+        specializationUpdated: "Specialization updated successfully",
+        specializationDeleted: "Specialization deleted successfully",
+        specializationAssigned: "Specialization assigned to your profile",
+        specializationRemoved: "Specialization removed from your profile",
+        error: "An error occurred. Please try again."
+      }
+    },
+    
+    conversationManager: {
+      title: "Messages",
+      messages: "Messages",
+      conversations: "Conversations",
+      newMessage: "New Message",
+      send: "Send",
+      reply: "Reply",
+      attachFile: "Attach File",
+      messageContent: "Message Content",
+      sender: "Sender",
+      recipient: "Recipient",
+      sentAt: "Sent",
+      read: "Read",
+      unread: "Unread",
+      markAsRead: "Mark as Read",
+      markAsUnread: "Mark as Unread",
+      delete: "Delete",
+      selectCase: "Select Case",
+      selectRecipient: "Select Recipient",
+      noMessages: "No messages found",
+      typeMessage: "Type your message here...",
+      notifications: {
+        messageSent: "Message sent successfully",
+        messageDeleted: "Message deleted successfully",
+        markedAsRead: "Message marked as read",
+        markedAsUnread: "Message marked as unread",
+        error: "An error occurred. Please try again."
+      }
+    },
+    
+    userDashboard: {
+      title: "User Dashboard",
+      welcome: "Welcome to your dashboard",
+      goToDashboard: "Go to Dashboard",
+      myCases: "My Cases",
+      myMessages: "My Messages",
+      createNewCase: "Create New Case",
+      profile: "My Profile",
+      updateProfile: "Update Profile",
+      displayName: "Display Name",
+      email: "Email",
+      contactNumber: "Contact Number",
+      bio: "Bio",
+      profilePicture: "Profile Picture",
+      uploadPicture: "Upload Picture",
+      save: "Save Changes",
+      cancel: "Cancel",
+      messages: {
+        profileUpdated: "Profile updated successfully",
+        error: "An error occurred. Please try again."
+      }
+    },
+    
+    lawyerDashboard: {
+      title: "Lawyer Dashboard",
+      welcome: "Welcome to your lawyer dashboard",
+      goToDashboard: "Go to Dashboard",
+      assignedCases: "Assigned Cases",
+      pendingCases: "Pending Cases",
+      mySpecializations: "My Specializations",
+      manageSpecializations: "Manage Specializations",
+      myMessages: "My Messages",
+      profile: "My Profile",
+      updateProfile: "Update Profile",
+      displayName: "Display Name",
+      email: "Email",
+      contactNumber: "Contact Number",
+      bio: "Bio",
+      profilePicture: "Profile Picture",
+      uploadPicture: "Upload Picture",
+      save: "Save Changes",
+      cancel: "Cancel",
+      messages: {
+        profileUpdated: "Profile updated successfully",
+        error: "An error occurred. Please try again."
+      }
+    },
+    
+    adminDashboard: {
+      title: "Admin Dashboard",
+      welcome: "Welcome to the admin dashboard",
+      goToDashboard: "Go to Dashboard",
+      users: "Users",
+      lawyers: "Lawyers",
+      cases: "Cases",
+      specializations: "Specializations",
+      manageUsers: "Manage Users",
+      manageLawyers: "Manage Lawyers",
+      manageCases: "Manage Cases",
+      manageSpecializations: "Manage Specializations",
+      userManagement: "User Management",
+      lawyerManagement: "Lawyer Management",
+      caseManagement: "Case Management",
+      specializationManagement: "Specialization Management",
+      addUser: "Add User",
+      addLawyer: "Add Lawyer",
+      addSpecialization: "Add Specialization",
+      systemStats: "System Statistics",
+      recentActivities: "Recent Activities",
+      pendingReviews: "Pending Reviews",
+      systemControls: "System Controls",
+      errorFetchingData: "Error fetching data. Please try again.",
+      specializationAddedSuccess: "Specialization added successfully",
+      errorAddingSpecialization: "Error adding specialization. Please try again."
     }
   },
   hi: {
@@ -417,6 +598,186 @@ export const translations = {
       aiResponse: "भाई, आपके सवाल के लिए धन्यवाद",
       aiHelp: "चलिए मिलकर इस कानूनी मामले को सुलझाते हैं। मैं आपका दोस्त हूं, डरने की कोई बात नहीं।",
       responseReceived: "AI का जवाब मिल गया!"
+    },
+    
+    // New translations for database schema components in Hindi
+    caseManagement: {
+      title: "केस प्रबंधन",
+      manageCases: "केस प्रबंधित करें",
+      createCase: "नया केस बनाएं",
+      myCases: "मेरे केस",
+      assignedCases: "सौंपे गए केस",
+      allCases: "सभी केस",
+      caseDetails: "केस विवरण",
+      caseTitle: "केस शीर्षक",
+      caseDescription: "केस विवरण",
+      caseStatus: "स्थिति",
+      clientName: "ग्राहक",
+      lawyerName: "वकील",
+      createdAt: "बनाया गया",
+      updatedAt: "अपडेट किया गया",
+      documents: "दस्तावेज़",
+      uploadDocument: "दस्तावेज़ अपलोड करें",
+      documentName: "दस्तावेज़ का नाम",
+      documentType: "दस्तावेज़ प्रकार",
+      documentDescription: "दस्तावेज़ विवरण",
+      uploadedBy: "अपलोड किया गया",
+      uploadedAt: "अपलोड किया गया",
+      download: "डाउनलोड",
+      view: "देखें",
+      delete: "हटाएं",
+      submit: "जमा करें",
+      cancel: "रद्द करें",
+      save: "सहेजें",
+      edit: "संपादित करें",
+      close: "बंद करें",
+      assign: "वकील नियुक्त करें",
+      statusOptions: {
+        open: "खुला",
+        in_progress: "प्रगति पर",
+        closed: "बंद",
+        pending: "समीक्षा के लिए लंबित"
+      },
+      messages: {
+        caseCreated: "केस सफलतापूर्वक बनाया गया",
+        caseUpdated: "केस सफलतापूर्वक अपडेट किया गया",
+        caseDeleted: "केस सफलतापूर्वक हटाया गया",
+        documentUploaded: "दस्तावेज़ सफलतापूर्वक अपलोड किया गया",
+        documentDeleted: "दस्तावेज़ सफलतापूर्वक हटाया गया",
+        lawyerAssigned: "वकील सफलतापूर्वक नियुक्त किया गया",
+        error: "एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+      }
+    },
+    
+    specializationManagement: {
+      title: "विशेषज्ञता प्रबंधन",
+      manageSpecializations: "विशेषज्ञताएँ प्रबंधित करें",
+      mySpecializations: "मेरी विशेषज्ञताएँ",
+      allSpecializations: "सभी विशेषज्ञताएँ",
+      addSpecialization: "विशेषज्ञता जोड़ें",
+      specializationName: "विशेषज्ञता का नाम",
+      specializationDescription: "विवरण",
+      createdAt: "बनाया गया",
+      actions: "कार्रवाई",
+      submit: "जमा करें",
+      cancel: "रद्द करें",
+      save: "सहेजें",
+      edit: "संपादित करें",
+      delete: "हटाएं",
+      messages: {
+        specializationAdded: "विशेषज्ञता सफलतापूर्वक जोड़ी गई",
+        specializationUpdated: "विशेषज्ञता सफलतापूर्वक अपडेट की गई",
+        specializationDeleted: "विशेषज्ञता सफलतापूर्वक हटाई गई",
+        specializationAssigned: "विशेषज्ञता आपकी प्रोफ़ाइल से जुड़ी",
+        specializationRemoved: "विशेषज्ञता आपकी प्रोफ़ाइल से हटाई गई",
+        error: "एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+      }
+    },
+    
+    conversationManager: {
+      title: "संदेश",
+      messages: "संदेश",
+      conversations: "वार्तालाप",
+      newMessage: "नया संदेश",
+      send: "भेजें",
+      reply: "जवाब दें",
+      attachFile: "फ़ाइल संलग्न करें",
+      messageContent: "संदेश सामग्री",
+      sender: "प्रेषक",
+      recipient: "प्राप्तकर्ता",
+      sentAt: "भेजा गया",
+      read: "पढ़ा गया",
+      unread: "अपठित",
+      markAsRead: "पढ़ा हुआ चिह्नित करें",
+      markAsUnread: "अपठित चिह्नित करें",
+      delete: "हटाएं",
+      selectCase: "केस चुनें",
+      selectRecipient: "प्राप्तकर्ता चुनें",
+      noMessages: "कोई संदेश नहीं मिला",
+      typeMessage: "अपना संदेश यहां टाइप करें...",
+      notifications: {
+        messageSent: "संदेश सफलतापूर्वक भेजा गया",
+        messageDeleted: "संदेश सफलतापूर्वक हटाया गया",
+        markedAsRead: "संदेश पढ़ा हुआ चिह्नित किया गया",
+        markedAsUnread: "संदेश अपठित चिह्नित किया गया",
+        error: "एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+      }
+    },
+    
+    userDashboard: {
+      title: "उपयोगकर्ता डैशबोर्ड",
+      welcome: "आपके डैशबोर्ड में आपका स्वागत है",
+      goToDashboard: "डैशबोर्ड पर जाएं",
+      myCases: "मेरे केस",
+      myMessages: "मेरे संदेश",
+      createNewCase: "नया केस बनाएं",
+      profile: "मेरी प्रोफ़ाइल",
+      updateProfile: "प्रोफ़ाइल अपडेट करें",
+      displayName: "प्रदर्शित नाम",
+      email: "ईमेल",
+      contactNumber: "संपर्क नंबर",
+      bio: "परिचय",
+      profilePicture: "प्रोफ़ाइल चित्र",
+      uploadPicture: "चित्र अपलोड करें",
+      save: "परिवर्तन सहेजें",
+      cancel: "रद्द करें",
+      messages: {
+        profileUpdated: "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+        error: "एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+      }
+    },
+    
+    lawyerDashboard: {
+      title: "वकील डैशबोर्ड",
+      welcome: "आपके वकील डैशबोर्ड में आपका स्वागत है",
+      goToDashboard: "डैशबोर्ड पर जाएं",
+      assignedCases: "सौंपे गए केस",
+      pendingCases: "लंबित केस",
+      mySpecializations: "मेरी विशेषज्ञताएँ",
+      manageSpecializations: "विशेषज्ञताएँ प्रबंधित करें",
+      myMessages: "मेरे संदेश",
+      profile: "मेरी प्रोफ़ाइल",
+      updateProfile: "प्रोफ़ाइल अपडेट करें",
+      displayName: "प्रदर्शित नाम",
+      email: "ईमेल",
+      contactNumber: "संपर्क नंबर",
+      bio: "परिचय",
+      profilePicture: "प्रोफ़ाइल चित्र",
+      uploadPicture: "चित्र अपलोड करें",
+      save: "परिवर्तन सहेजें",
+      cancel: "रद्द करें",
+      messages: {
+        profileUpdated: "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+        error: "एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+      }
+    },
+    
+    adminDashboard: {
+      title: "एडमिन डैशबोर्ड",
+      welcome: "एडमिन डैशबोर्ड में आपका स्वागत है",
+      goToDashboard: "डैशबोर्ड पर जाएं",
+      users: "उपयोगकर्ता",
+      lawyers: "वकील",
+      cases: "केस",
+      specializations: "विशेषज्ञताएँ",
+      manageUsers: "उपयोगकर्ता प्रबंधित करें",
+      manageLawyers: "वकील प्रबंधित करें",
+      manageCases: "केस प्रबंधित करें",
+      manageSpecializations: "विशेषज्ञताएँ प्रबंधित करें",
+      userManagement: "उपयोगकर्ता प्रबंधन",
+      lawyerManagement: "वकील प्रबंधन",
+      caseManagement: "केस प्रबंधन",
+      specializationManagement: "विशेषज्ञता प्रबंधन",
+      addUser: "उपयोगकर्ता जोड़ें",
+      addLawyer: "वकील जोड़ें",
+      addSpecialization: "विशेषज्ञता जोड़ें",
+      systemStats: "सिस्टम आंकड़े",
+      recentActivities: "हाल की गतिविधियां",
+      pendingReviews: "लंबित समीक्षाएं",
+      systemControls: "सिस्टम नियंत्रण",
+      errorFetchingData: "डेटा प्राप्त करने में त्रुटि। कृपया पुनः प्रयास करें।",
+      specializationAddedSuccess: "विशेषज्ञता सफलतापूर्वक जोड़ी गई",
+      errorAddingSpecialization: "विशेषज्ञता जोड़ने में त्रुटि। कृपया पुनः प्रयास करें।"
     }
   }
 };

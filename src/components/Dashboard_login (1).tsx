@@ -1,12 +1,25 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
-import { UserDashboard } from '../components/dashboards/UserDashboard';
-import { LawyerDashboard } from '../components/dashboards/LawyerDashboard';
-import { AdminDashboard } from '../components/dashboards/AdminDashboard';
+import { useAuth } from '../utils/AuthContext';
+import { UserDashboard } from './dashboards/UserDashboard';
+import { LawyerDashboard } from './dashboards/LawyerDashboard';
+import { AdminDashboard } from './dashboards/AdminDashboard';
+import { Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-export const Dashboard: React.FC = () => {
+interface DashboardProps {
+  t: any;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ t }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  const isLoggedIn = !!user;
+  
+  const handleLogin = () => {
+    navigate('/login');
+  };
 
   if (!user) {
     return (
@@ -17,8 +30,19 @@ export const Dashboard: React.FC = () => {
           className="text-center"
         >
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Please log in to access your dashboard
+            {t?.dashboard?.loginRequired || 'Please log in to access your dashboard'}
           </h2>
+          <p className="text-gray-600 mb-6">
+            {t?.dashboard?.loginMessage || 'You need to login to access the dashboard'}
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleLogin}
+            className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+          >
+            {t?.dashboard?.loginButton || 'Login'}
+          </motion.button>
         </motion.div>
       </div>
     );

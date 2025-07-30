@@ -1,81 +1,80 @@
-import React from 'react';
-import { FileText, Calendar, Upload, Lock } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useAuth } from '../utils/AuthContext';
+import { UserDashboard } from './dashboards/UserDashboard';
+import { LawyerDashboard } from './dashboards/LawyerDashboard';
+import { AdminDashboard } from './dashboards/AdminDashboard';
+import { Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { translations } from '../utils/translations';
 
 interface DashboardProps {
-  isLoggedIn: boolean;
   t: any;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ isLoggedIn, t }) => {
+const Dashboard: React.FC<DashboardProps> = ({ t }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  const isLoggedIn = !!user;
+  
+  // Get language preference from localStorage
+  const [language, setLanguage] = useState<'en' | 'hi'>(() => {
+    const savedLanguage = localStorage.getItem('language');
+    return (savedLanguage === 'en' || savedLanguage === 'hi') ? savedLanguage : 'en';
+  });
+  
+  // Get translations based on language
+  const localT = translations[language];
+  
   const handleLogin = () => {
-    localStorage.setItem('isLoggedIn', 'true');
-    window.location.reload();
+    navigate('/login');
+  };
+
+  const renderDashboard = () => {
+    if (!user) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {language === 'en' ? (t.dashboard.loginRequired || 'Please log in to access your dashboard') : 'डैशबोर्ड तक पहुंचने के लिए कृपया लॉगिन करें'}
+            </h2>
+            <p className="text-gray-600 mb-6">
+              {language === 'en' ? (t.dashboard.loginMessage || 'You need to login to access the dashboard') : 'डैशबोर्ड तक पहुंचने के लिए आपको लॉगिन करना होगा'}
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleLogin}
+              className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+            >
+              {language === 'en' ? (t.dashboard.loginButton || 'Login') : 'लॉगिन करें'}
+            </motion.button>
+          </motion.div>
+        </div>
+      );
+    }
+
+    switch (user.role) {
+      case 'lawyer':
+        return <LawyerDashboard />;
+      case 'admin':
+        return <AdminDashboard />;
+      default:
+        return <UserDashboard />;
+    }
   };
 
   return (
-    <section className="py-20 px-4 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold font-serif text-black mb-4">
-            {t.dashboard.heading}
-          </h2>
-        </div>
-
-        <div className="relative">
-          <div className={`bg-white rounded-2xl p-8 lg:p-12 shadow-lg ${!isLoggedIn ? 'blur-sm' : ''}`}>
-            <div className="grid lg:grid-cols-2 gap-12">
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold font-serif text-black">
-                  {t.dashboard.trackTitle}
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                    <FileText className="w-8 h-8 text-black" />
-                    <div>
-                      <h4 className="font-bold text-black">{t.dashboard.lastDocument}</h4>
-                      <p className="text-gray-600 text-sm">Legal Notice - Pending Review</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                    <Calendar className="w-8 h-8 text-black" />
-                    <div>
-                      <h4 className="font-bold text-black">{t.dashboard.consultation}</h4>
-                      <p className="text-gray-600 text-sm">Tomorrow, 2:00 PM</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col items-center justify-center space-y-4">
-                <Upload className="w-20 h-20 text-gray-400" />
-                <p className="text-gray-600 text-center">{t.dashboard.uploadMessage}</p>
-              </div>
-            </div>
-          </div>
-
-          {!isLoggedIn && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 rounded-2xl">
-              <div className="text-center space-y-6">
-                <Lock className="w-16 h-16 text-black mx-auto" />
-                <div>
-                  <h3 className="text-2xl font-bold font-serif text-black mb-2">
-                    {t.dashboard.loginRequired}
-                  </h3>
-                  <p className="text-gray-700 mb-6">{t.dashboard.loginMessage}</p>
-                  <button
-                    onClick={handleLogin}
-                    className="bg-black text-white px-8 py-3 rounded-lg font-sans font-medium hover:scale-105 transition-all"
-                  >
-                    {t.dashboard.loginButton}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
+    <div className="min-h-screen bg-gray-50">
+      {renderDashboard()}
+    </div>
   );
 };
 
+export { Dashboard };
 export default Dashboard;

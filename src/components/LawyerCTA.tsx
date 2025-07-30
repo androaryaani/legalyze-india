@@ -28,4 +28,4 @@ const LawyerCTA: React.FC<LawyerCTAProps> = ({ t }) => {
   );
 };
 
-export default LawyerCTA;
+export { LawyerCTA };

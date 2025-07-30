@@ -4,9 +4,10 @@ import { Database, Shield, FileText, Download, CheckCircle, AlertCircle } from '
 interface DigiLockerIntegrationProps {
   t: any;
   isLoggedIn: boolean;
+  userType?: 'main' | 'user' | 'admin' | 'lawyer';
 }
 
-const DigiLockerIntegration: React.FC<DigiLockerIntegrationProps> = ({ t, isLoggedIn }) => {
+const DigiLockerIntegration: React.FC<DigiLockerIntegrationProps> = ({ t, isLoggedIn, userType = 'user' }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [documents, setDocuments] = useState([
     { id: 1, name: "Aadhaar Card", type: "Identity", status: "verified", icon: "🆔" },
@@ -196,4 +197,5 @@ const DigiLockerIntegration: React.FC<DigiLockerIntegrationProps> = ({ t, isLogg
   );
 };
 
+export { DigiLockerIntegration };
 export default DigiLockerIntegration;

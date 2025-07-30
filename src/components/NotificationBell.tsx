@@ -4,48 +4,134 @@ import { Bell, X, FileText, Calendar, MessageSquare, CheckCircle } from 'lucide-
 interface NotificationBellProps {
   t: any;
   isLoggedIn: boolean;
+  userType?: 'main' | 'user' | 'admin' | 'lawyer';
 }
 
-const NotificationBell: React.FC<NotificationBellProps> = ({ t, isLoggedIn }) => {
+const NotificationBell: React.FC<NotificationBellProps> = ({ t, isLoggedIn, userType = 'user' }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'document',
-      title: 'Legal Notice Ready',
-      message: 'Your legal notice has been reviewed and approved by Adv. Rajesh Kumar',
-      time: '2 hours ago',
-      read: false,
-      icon: FileText
-    },
-    {
-      id: 2,
-      type: 'consultation',
-      title: 'Consultation Reminder',
-      message: 'Your consultation with Adv. Priya Sharma is scheduled for tomorrow at 2:00 PM',
-      time: '1 day ago',
-      read: false,
-      icon: Calendar
-    },
-    {
-      id: 3,
-      type: 'message',
-      title: 'New Message',
-      message: 'You have received a response to your legal query about property dispute',
-      time: '2 days ago',
-      read: true,
-      icon: MessageSquare
-    },
-    {
-      id: 4,
-      type: 'update',
-      title: 'Case Status Update',
-      message: 'Your RTI application has been successfully submitted to the concerned authority',
-      time: '3 days ago',
-      read: true,
-      icon: CheckCircle
+  const [notifications, setNotifications] = useState(() => {
+    // Different notifications based on user type
+    if (userType === 'user') {
+      return [
+        {
+          id: 1,
+          type: 'document',
+          title: 'Legal Notice Ready',
+          message: 'Your legal notice has been reviewed and approved by Adv. Rajesh Kumar',
+          time: '2 hours ago',
+          read: false,
+          icon: FileText
+        },
+        {
+          id: 2,
+          type: 'consultation',
+          title: 'Consultation Reminder',
+          message: 'Your consultation with Adv. Priya Sharma is scheduled for tomorrow at 2:00 PM',
+          time: '1 day ago',
+          read: false,
+          icon: Calendar
+        },
+        {
+          id: 3,
+          type: 'message',
+          title: 'New Message',
+          message: 'You have received a response to your legal query about property dispute',
+          time: '2 days ago',
+          read: true,
+          icon: MessageSquare
+        },
+        {
+          id: 4,
+          type: 'update',
+          title: 'Case Status Update',
+          message: 'Your RTI application has been successfully submitted to the concerned authority',
+          time: '3 days ago',
+          read: true,
+          icon: CheckCircle
+        }
+      ];
+    } else if (userType === 'lawyer') {
+      return [
+        {
+          id: 1,
+          type: 'client',
+          title: 'New Client Request',
+          message: 'Rahul Sharma has requested a consultation for a property dispute case',
+          time: '1 hour ago',
+          read: false,
+          icon: MessageSquare
+        },
+        {
+          id: 2,
+          type: 'document',
+          title: 'Document Review Required',
+          message: 'A legal notice draft requires your review and approval',
+          time: '3 hours ago',
+          read: false,
+          icon: FileText
+        },
+        {
+          id: 3,
+          type: 'consultation',
+          title: 'Consultation Scheduled',
+          message: 'You have a video consultation with Priya Patel at 4:00 PM today',
+          time: '1 day ago',
+          read: true,
+          icon: Calendar
+        },
+        {
+          id: 4,
+          type: 'payment',
+          title: 'Payment Received',
+          message: 'You have received a payment of ₹5,000 for consultation services',
+          time: '2 days ago',
+          read: true,
+          icon: CheckCircle
+        }
+      ];
+    } else if (userType === 'admin') {
+      return [
+        {
+          id: 1,
+          type: 'system',
+          title: 'System Alert',
+          message: 'High traffic detected on the platform. Server resources at 80%',
+          time: '30 minutes ago',
+          read: false,
+          icon: Bell
+        },
+        {
+          id: 2,
+          type: 'user',
+          title: 'New User Registrations',
+          message: '15 new users have registered in the last 24 hours',
+          time: '2 hours ago',
+          read: false,
+          icon: CheckCircle
+        },
+        {
+          id: 3,
+          type: 'lawyer',
+          title: 'Lawyer Verification Pending',
+          message: '3 lawyer profiles are awaiting verification and approval',
+          time: '1 day ago',
+          read: true,
+          icon: FileText
+        },
+        {
+          id: 4,
+          type: 'report',
+          title: 'Weekly Report Ready',
+          message: 'The platform usage and analytics report for last week is ready',
+          time: '2 days ago',
+          read: true,
+          icon: Calendar
+        }
+      ];
+    } else {
+      return [];
     }
-  ]);
+  });
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -171,4 +257,5 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ t, isLoggedIn }) =>
   );
 };
 
+export { NotificationBell };
 export default NotificationBell;

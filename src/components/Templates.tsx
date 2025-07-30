@@ -237,4 +237,5 @@ const Templates: React.FC<TemplatesProps> = ({ t, showToast }) => {
   );
 };
 
+export { Templates };
 export default Templates;

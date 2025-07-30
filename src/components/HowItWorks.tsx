@@ -91,4 +91,4 @@ const HowItWorks: React.FC<HowItWorksProps> = ({ t }) => {
   );
 };
 
-export default HowItWorks;
+export { HowItWorks };
