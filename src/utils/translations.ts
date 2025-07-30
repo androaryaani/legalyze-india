@@ -10,12 +10,46 @@ export const translations = {
         templates: "Templates",
         about: "About"
       },
-      dashboard: "Dashboard"
+      dashboard: "Dashboard",
+      signIn: "Sign In",
+      signUp: "Sign Up"
+    },
+    digiLocker: {
+      title: "DigiLocker Integration",
+      subtitle: "Connect your DigiLocker for seamless document access",
+      description: "Our secure one-click authentication allows you to access all your government-issued documents directly within our platform. No more manual uploads or verification delays.",
+      connect: "Connect DigiLocker",
+      connected: "Connected",
+      notConnected: "Not Connected",
+      loginRequired: "Login Required",
+      securityNote: "Your data is secure with 256-bit encryption",
+      benefits: {
+        title: "Benefits of Connecting",
+        b1: "Instant document verification",
+        b2: "Faster legal processing",
+        b3: "Secure document sharing",
+        b4: "One-click document sharing with authorized lawyers",
+        b5: "End-to-end encrypted document access"
+      },
+      connectedBenefits: {
+        b1: "AI can now access your documents for better legal advice",
+        b2: "Automatic document verification for legal processes",
+        b3: "Faster case analysis with your personal information",
+        b4: "One-click document sharing with authorized lawyers",
+        b5: "End-to-end encrypted document access"
+      }
     },
     hero: {
       heading: "Your Legal Bridge to Justice — AI Powered, Lawyer Verified",
       subtext: "Empowering Every Indian with Accessible Legal Solutions — Connecting You with Real Lawyers",
-      cta: "Start Your Legal Query"
+      cta: "Start Your Legal Query",
+      features: {
+        encryption: "End-to-end encrypted legal documents",
+        verification: "AI-generated, lawyer-verified documents",
+        connection: "Connect with specialized lawyers",
+        digilocker: "DigiLocker Integrated",
+        compliance: "Compliant with Indian Law"
+      }
     },
     features: {
       heading: "What Can You Do Here?",
@@ -42,6 +76,22 @@ export const translations = {
       tracking: {
         title: "Case Tracking",
         description: "Check your case status instantly"
+      },
+      digilocker: {
+        title: "DigiLocker Integration",
+        description: "Access government documents securely"
+      },
+      security: {
+        title: "Data Security",
+        description: "End-to-end encryption for all documents"
+      },
+      profile: {
+        title: "Legal Profile",
+        description: "Personalized legal assistance"
+      },
+      video: {
+        title: "Video Consultation",
+        description: "Connect with lawyers remotely"
       }
     },
     lawyers: {
@@ -132,6 +182,18 @@ export const translations = {
       step4: {
         title: "Download & Send",
         description: "Get your approved document ready to use"
+      },
+      step5: {
+        title: "DigiLocker Integration",
+        description: "Connect your DigiLocker to access and share government documents securely"
+      },
+      step6: {
+        title: "Legal Profile Creation",
+        description: "Create your personalized legal profile for faster document generation"
+      },
+      step7: {
+        title: "Video Consultation",
+        description: "Connect with lawyers through secure video calls for personalized advice"
       }
     },
     dashboard: {
@@ -169,6 +231,18 @@ export const translations = {
       q6: {
         question: "What if I need human legal advice?",
         answer: "You can book consultations with verified lawyers through our platform for complex legal matters requiring human expertise."
+      },
+      q7: {
+        question: "How does DigiLocker integration work?",
+        answer: "Our DigiLocker integration allows you to securely access and share your government-issued documents directly within our platform, making document verification faster and more secure."
+      },
+      q8: {
+        question: "What is a Personal Legal Profile?",
+        answer: "Your Personal Legal Profile stores your legal history, document preferences, and personal details securely, making future document generation faster and more personalized to your specific needs."
+      },
+      q9: {
+        question: "How secure are my documents on this platform?",
+        answer: "We use end-to-end encryption for all documents and comply with Indian data protection standards. Your data is only accessible to you and the legal professionals you explicitly authorize."
       }
     },
     lawyerCTA: {
@@ -191,8 +265,7 @@ export const translations = {
         privacy: "Data Privacy",
         terms: "Terms of Use",
         compliance: "Bar Council Compliant"
-      },
-      disclaimer: "This is not legal advice. All AI suggestions are lawyer-reviewed."
+      }
     },
     chat: {
       title: "AI Legal Mitra",
@@ -234,7 +307,9 @@ export const translations = {
       uploadedBy: "Uploaded By",
       uploadedAt: "Uploaded At",
       download: "Download",
+      downloadDocument: "Download",
       view: "View",
+      viewDocument: "View",
       delete: "Delete",
       submit: "Submit",
       cancel: "Cancel",
@@ -242,6 +317,29 @@ export const translations = {
       edit: "Edit",
       close: "Close",
       assign: "Assign Lawyer",
+      uploadNewDocument: "Upload New Document",
+      documentNamePlaceholder: "Enter document name",
+      selectFile: "Select File",
+      documentDescriptionPlaceholder: "Enter document description",
+      upload: "Upload",
+      noDocuments: "No documents available",
+      errorFetchingCases: "Error fetching cases",
+      errorFetchingDocuments: "Error fetching documents",
+      caseCreatedSuccess: "Case created successfully",
+      errorCreatingCase: "Error creating case",
+      documentUploadedSuccess: "Document uploaded successfully",
+      errorUploadingDocument: "Error uploading document",
+      heading: "Case Management",
+      createNewCase: "Create New Case",
+      newCaseFormTitle: "Create New Case",
+      noCases: "No Cases Found",
+      noCasesDescription: "You don't have any cases yet",
+      createFirstCase: "Create Your First Case",
+      yourCases: "Your Cases",
+      statusOpen: "Open",
+      statusInProgress: "In Progress",
+      statusClosed: "Closed",
+      statusPending: "Pending Review",
       statusOptions: {
         open: "Open",
         in_progress: "In Progress",
@@ -401,12 +499,46 @@ export const translations = {
         templates: "टेम्प्लेट",
         about: "हमारे बारे में"
       },
-      dashboard: "डैशबोर्ड"
+      dashboard: "डैशबोर्ड",
+      signIn: "साइन इन",
+      signUp: "साइन अप"
+    },
+    digiLocker: {
+      title: "डिजीलॉकर इंटीग्रेशन",
+      subtitle: "आसान दस्तावेज़ पहुंच के लिए अपना डिजीलॉकर कनेक्ट करें",
+      description: "हमारा सुरक्षित वन-क्लिक प्रमाणीकरण आपको हमारे प्लेटफॉर्म के भीतर सीधे अपने सभी सरकारी दस्तावेजों तक पहुंचने की अनुमति देता है। अब मैनुअल अपलोड या सत्यापन में देरी नहीं होगी।",
+      connect: "डिजीलॉकर कनेक्ट करें",
+      connected: "कनेक्टेड",
+      notConnected: "कनेक्ट नहीं है",
+      loginRequired: "लॉगिन आवश्यक",
+      securityNote: "आपका डेटा 256-बिट एन्क्रिप्शन के साथ सुरक्षित है",
+      benefits: {
+        title: "कनेक्ट करने के लाभ",
+        b1: "तत्काल दस्तावेज़ सत्यापन",
+        b2: "तेज़ कानूनी प्रक्रिया",
+        b3: "सुरक्षित दस्तावेज़ शेयरिंग",
+        b4: "अधिकृत वकीलों के साथ वन-क्लिक दस्तावेज़ शेयरिंग",
+        b5: "एंड-टू-एंड एन्क्रिप्टेड दस्तावेज़ एक्सेस"
+      },
+      connectedBenefits: {
+        b1: "AI अब बेहतर कानूनी सलाह के लिए आपके दस्तावेज़ों तक पहुंच सकता है",
+        b2: "कानूनी प्रक्रियाओं के लिए स्वचालित दस्तावेज़ सत्यापन",
+        b3: "आपकी व्यक्तिगत जानकारी के साथ तेज़ केस विश्लेषण",
+        b4: "अधिकृत वकीलों के साथ वन-क्लिक दस्तावेज़ शेयरिंग",
+        b5: "एंड-टू-एंड एन्क्रिप्टेड दस्तावेज़ एक्सेस"
+      }
     },
     hero: {
       heading: "न्याय के लिए आपका कानूनी पुल — AI पावर्ड, वकील वेरिफाइड",
-      subtext: "डिजीलॉकर इंटीग्रेशन के साथ कानूनी नोटिस, FIR, अनुबंध, RTI ड्राफ्ट करें — बिना किसी परेशानी के",
-      cta: "अपना कानूनी सवाल शुरू करें"
+      subtext: "डिजीलॉकर इंटीग्रेशन के साथ कानूनी नोटिस, FIR, अनुबंध, RTI ड्राफ्ट करें — बिना किसी परेशानी के और सुरक्षित",
+      cta: "अपना कानूनी सवाल शुरू करें",
+      features: {
+        encryption: "एंड-टू-एंड एन्क्रिप्टेड कानूनी दस्तावेज़",
+        verification: "AI द्वारा जनरेट, वकील द्वारा वेरिफाइड दस्तावेज़",
+        connection: "विशेषज्ञ वकीलों से जुड़ें",
+        digilocker: "डिजीलॉकर इंटीग्रेटेड",
+        compliance: "भारतीय कानून के अनुरूप"
+      }
     },
     features: {
       heading: "यहाँ आप क्या कर सकते हैं?",
@@ -433,6 +565,22 @@ export const translations = {
       tracking: {
         title: "केस ट्रैकिंग",
         description: "अपने केस की स्थिति तुरंत जांचें"
+      },
+      digilocker: {
+        title: "डिजीलॉकर इंटीग्रेशन",
+        description: "सरकारी दस्तावेजों को सुरक्षित रूप से एक्सेस करें"
+      },
+      security: {
+        title: "डेटा सुरक्षा",
+        description: "सभी दस्तावेजों के लिए एंड-टू-एंड एन्क्रिप्शन"
+      },
+      profile: {
+        title: "कानूनी प्रोफाइल",
+        description: "व्यक्तिगत कानूनी सहायता"
+      },
+      video: {
+        title: "वीडियो परामर्श",
+        description: "दूरस्थ रूप से वकीलों से जुड़ें"
       }
     },
     lawyers: {
@@ -523,6 +671,18 @@ export const translations = {
       step4: {
         title: "डाउनलोड और भेजें",
         description: "अपना अप्रूव्ड दस्तावेज़ उपयोग के लिए तैयार पाएं"
+      },
+      step5: {
+        title: "डिजीलॉकर इंटीग्रेशन",
+        description: "अपने सरकारी दस्तावेजों को सुरक्षित रूप से एक्सेस और शेयर करने के लिए डिजीलॉकर से कनेक्ट करें"
+      },
+      step6: {
+        title: "कानूनी प्रोफाइल निर्माण",
+        description: "तेज़ दस्तावेज़ जनरेशन के लिए अपनी व्यक्तिगत कानूनी प्रोफाइल बनाएं"
+      },
+      step7: {
+        title: "वीडियो परामर्श",
+        description: "व्यक्तिगत सलाह के लिए सुरक्षित वीडियो कॉल के माध्यम से वकीलों से जुड़ें"
       }
     },
     dashboard: {
@@ -560,6 +720,18 @@ export const translations = {
       q6: {
         question: "यदि मुझे मानवीय कानूनी सलाह चाहिए तो क्या करूं?",
         answer: "जटिल कानूनी मामलों के लिए आप हमारे प्लेटफॉर्म के माध्यम से वेरिफाइड वकीलों के साथ सलाह बुक कर सकते हैं।"
+      },
+      q7: {
+        question: "डिजीलॉकर इंटीग्रेशन कैसे काम करता है?",
+        answer: "हमारा डिजीलॉकर इंटीग्रेशन आपको अपने सरकारी दस्तावेजों को हमारे प्लेटफॉर्म के भीतर सीधे और सुरक्षित रूप से एक्सेस और शेयर करने की अनुमति देता है, जिससे दस्तावेज़ सत्यापन तेज़ और अधिक सुरक्षित हो जाता है।"
+      },
+      q8: {
+        question: "व्यक्तिगत कानूनी प्रोफाइल क्या है?",
+        answer: "आपकी व्यक्तिगत कानूनी प्रोफाइल आपके कानूनी इतिहास, दस्तावेज़ प्राथमिकताओं और व्यक्तिगत विवरणों को सुरक्षित रूप से स्टोर करती है, जिससे भविष्य में दस्तावेज़ जनरेशन आपकी विशिष्ट आवश्यकताओं के अनुसार तेज़ और अधिक व्यक्तिगत हो जाता है।"
+      },
+      q9: {
+        question: "इस प्लेटफॉर्म पर मेरे दस्तावेज़ कितने सुरक्षित हैं?",
+        answer: "हम सभी दस्तावेजों के लिए एंड-टू-एंड एन्क्रिप्शन का उपयोग करते हैं और भारतीय डेटा सुरक्षा मानकों का पालन करते हैं। आपका डेटा केवल आपके और आपके द्वारा स्पष्ट रूप से अधिकृत कानूनी पेशेवरों के लिए ही एक्सेसिबल है।"
       }
     },
     lawyerCTA: {
@@ -581,8 +753,7 @@ export const translations = {
         privacy: "डेटा गोपनीयता",
         terms: "उपयोग की शर्तें",
         compliance: "बार काउंसिल अनुपालित"
-      },
-      disclaimer: "यह कानूनी सलाह नहीं है। सभी AI सुझाव वकील-समीक्षित हैं।"
+      }
     },
     chat: {
       title: "AI कानूनी मित्र",

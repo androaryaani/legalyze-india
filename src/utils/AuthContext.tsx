@@ -1,27 +1,30 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, AuthContextType } from '../types';
+import { User, AuthContextType, UserRole } from '../types';
 import { auth } from './firebase';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, User as FirebaseUser } from 'firebase/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Map of email domains to user roles for testing
-const userRoleMap: Record<string, 'user' | 'lawyer' | 'admin'> = {
-  'test_user@legalyze.in': 'user',
-  'test_lawyer@legalyze.in': 'lawyer',
-  'test_admin@legalyze.in': 'admin'
-};
-
-// Helper function to determine user role based on email
-const getUserRoleFromEmail = (email: string): 'user' | 'lawyer' | 'admin' => {
+// Helper function to get user role from email
+const getUserRoleFromEmail = (email: string): UserRole => {
+  const userRoleMap: Record<string, UserRole> = {
+    'test_user@legalyze.in': 'user',
+    'test_lawyer@legalyze.in': 'lawyer',
+    'test_admin@legalyze.in': 'admin'
+  };
+  
   return userRoleMap[email] || 'user';
 };
 
-// Helper function to get user name based on email
-const getUserNameFromEmail = (email: string): string => {
-  if (email.includes('lawyer')) return 'Advocate Sharma';
-  if (email.includes('admin')) return 'Admin User';
-  return 'Test User';
+// Helper function to get user name from email
+const getUserNameFromEmail = (email: string) => {
+  const userNameMap: Record<string, string> = {
+    'test_user@legalyze.in': 'Test User',
+    'test_lawyer@legalyze.in': 'Test Lawyer',
+    'test_admin@legalyze.in': 'Test Admin'
+  };
+  
+  return userNameMap[email] || email.split('@')[0];
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -29,23 +32,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        // User is signed in
-        const email = firebaseUser.email || '';
-        const userRole = getUserRoleFromEmail(email);
-        const userName = getUserNameFromEmail(email);
-        
-        const userData: User = {
-          id: firebaseUser.uid,
-          email: email,
-          role: userRole,
-          name: userName
-        };
-        
-        setUser(userData);
-        localStorage.setItem('legalyze_user', JSON.stringify(userData));
+        // Check if we have user data in localStorage first
+        const storedUserData = localStorage.getItem('legalyze_user');
+        if (storedUserData) {
+          try {
+            const parsedUserData = JSON.parse(storedUserData);
+            setUser(parsedUserData);
+          } catch (error) {
+            console.error('Error parsing stored user data:', error);
+            // Fallback to creating user data from Firebase user
+            createUserDataFromFirebase(firebaseUser);
+          }
+        } else {
+          // Create user data from Firebase user
+          createUserDataFromFirebase(firebaseUser);
+        }
       } else {
         // User is signed out
         setUser(null);
@@ -53,22 +56,65 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       setIsLoading(false);
     });
-    
-    // Cleanup subscription on unmount
+
     return () => unsubscribe();
   }, []);
+  
+  // Helper function to create user data from Firebase user
+  const createUserDataFromFirebase = (firebaseUser: FirebaseUser) => {
+    const userData: User = {
+      id: firebaseUser.uid,
+      email: firebaseUser.email || '',
+      role: getUserRoleFromEmail(firebaseUser.email || ''),
+      name: firebaseUser.displayName || getUserNameFromEmail(firebaseUser.email || '')
+    };
+    setUser(userData);
+    localStorage.setItem('legalyze_user', JSON.stringify(userData));
+  };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      // Check if Firebase is properly initialized
+      if (!auth) {
+        console.error('Firebase auth is not initialized');
+        setIsLoading(false);
+        return false;
+      }
+
+      // Sign in with Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Get user role and name
+      const role = getUserRoleFromEmail(email);
+      const name = userCredential.user.displayName || getUserNameFromEmail(email);
+      
+      // Create user object
+      const userData: User = {
+        id: userCredential.user.uid,
+        email: email,
+        role: role,
+        name: name
+      };
+      
+      // Store in localStorage
+      localStorage.setItem('legalyze_user', JSON.stringify(userData));
+      
+      // Set user in state
+      setUser(userData);
+      
       // Auth state listener will handle setting the user
-      // Make sure to set isLoading to false after successful login
       setIsLoading(false);
       return true;
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (error: any) {
+      console.error('Login error:', error.code, error.message);
+      
+      // Check if the error is related to Firebase setup
+      if (error.code === 'auth/operation-not-allowed') {
+        console.error('Email/password sign-in is not enabled in Firebase Console');
+      }
+      
       setIsLoading(false);
       return false;
     }
@@ -83,10 +129,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const signup = async (email: string, password: string, name: string): Promise<boolean> => {
+  const signup = async (email: string, password: string, name: string, role: UserRole = 'user'): Promise<boolean> => {
     setIsLoading(true);
     
     try {
+      // Check if Firebase is properly initialized
+      if (!auth) {
+        console.error('Firebase auth is not initialized');
+        setIsLoading(false);
+        return false;
+      }
+
       // Create user with Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
@@ -95,11 +148,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         displayName: name
       });
       
+      // Store user role in localStorage
+      const userData: User = {
+        id: userCredential.user.uid,
+        email: email,
+        role: role,
+        name: name
+      };
+      
+      localStorage.setItem('legalyze_user', JSON.stringify(userData));
+      
       // Auth state listener will handle setting the user
       setIsLoading(false);
       return true;
-    } catch (error) {
-      console.error('Signup error:', error);
+    } catch (error: any) {
+      console.error('Signup error:', error.code, error.message);
+      
+      // Check if the error is related to Firebase setup
+      if (error.code === 'auth/operation-not-allowed') {
+        console.error('Email/password sign-up is not enabled in Firebase Console');
+      } else if (error.code === 'auth/invalid-api-key') {
+        console.error('Invalid Firebase API key');
+      } else if (error.code === 'auth/app-deleted') {
+        console.error('Firebase app was deleted');
+      } else if (error.code === 'auth/internal-error') {
+        console.error('Firebase internal error - check your configuration');
+      }
+      
       setIsLoading(false);
       return false;
     }

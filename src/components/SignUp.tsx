@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../utils/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, User, Lock, Eye, EyeOff, Mail, UserPlus } from 'lucide-react';
+import { Loader2, User, Lock, Eye, EyeOff, Mail, UserPlus, Briefcase, ShieldCheck } from 'lucide-react';
 // Using AuthContext for signup functionality
 import { translations } from '../utils/translations';
+import { UserRole } from '../types';
 
 // SignUp component
 
@@ -13,6 +14,7 @@ export const SignUp: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [role, setRole] = useState<UserRole>('user');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { signup, isLoading } = useAuth();
@@ -33,38 +35,59 @@ export const SignUp: React.FC = () => {
 
     // Validate form
     if (!email || !password || !confirmPassword || !name) {
-      setError('All fields are required');
+      setError(language === 'en' ? 'All fields are required' : 'सभी फील्ड आवश्यक हैं');
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(language === 'en' ? 'Passwords do not match' : 'पासवर्ड मेल नहीं खाते');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(language === 'en' ? 'Password must be at least 6 characters' : 'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए');
       return;
+    }
+    
+    // Set role based on email for test accounts
+    if (email === 'test_user@legalyze.in') {
+      setRole('user');
+    } else if (email === 'test_lawyer@legalyze.in') {
+      setRole('lawyer');
+    } else if (email === 'test_admin@legalyze.in') {
+      setRole('admin');
     }
 
     try {
-      const success = await signup(email, password, name);
+      const success = await signup(email, password, name, role);
       if (success) {
-        // Navigate to dashboard after successful signup
-        navigate('/dashboard');
+        navigate(`/${role === 'user' ? 'dashboard' : role === 'lawyer' ? 'lawyer-dashboard' : 'admin-dashboard'}`);
       } else {
-        setError('An error occurred during sign up. Please try again later.');
+        // Check if the issue might be with Firebase setup
+        setError(language === 'en' ? 
+          'Make sure you have set up Firebase Authentication in the Firebase Console' : 
+          'सुनिश्चित करें कि आपने फायरबेस कंसोल में फायरबेस ऑथेंटिकेशन सेटअप किया है');
       }
     } catch (err: any) {
-      console.error('Signup error:', err);
+      console.error('Signup error:', err.code, err.message);
       if (err.code === 'auth/email-already-in-use') {
-        setError('Email is already in use');
+        setError(language === 'en' ? 'Email is already in use' : 'ईमेल पहले से उपयोग में है');
       } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address');
+        setError(language === 'en' ? 'Invalid email address' : 'अमान्य ईमेल पता');
       } else if (err.code === 'auth/weak-password') {
-        setError('Password is too weak');
+        setError(language === 'en' ? 'Password is too weak' : 'पासवर्ड बहुत कमजोर है');
+      } else if (err.code === 'auth/operation-not-allowed') {
+        setError(language === 'en' ? 
+          'Email/password accounts are not enabled. Enable them in the Firebase Console, under the Auth section.' : 
+          'ईमेल/पासवर्ड अकाउंट सक्षम नहीं हैं। उन्हें फायरबेस कंसोल के Auth सेक्शन में सक्षम करें।');
+      } else if (err.code === 'auth/network-request-failed') {
+        setError(language === 'en' ? 
+          'Network error. Please check your internet connection.' : 
+          'नेटवर्क त्रुटि। कृपया अपने इंटरनेट कनेक्शन की जांच करें।');
       } else {
-        setError('An error occurred during sign up. Please try again later.');
+        setError(language === 'en' ? 
+          'An error occurred during sign up. Please try again later.' : 
+          'साइन अप के दौरान एक त्रुटि हुई। कृपया बाद में पुन: प्रयास करें।');
       }
     }
   };
@@ -203,6 +226,35 @@ export const SignUp: React.FC = () => {
                     className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
                     placeholder={language === 'en' ? 'Confirm your password' : 'अपने पासवर्ड की पुष्टि करें'}
                   />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  {language === 'en' ? 'Select Role' : 'भूमिका चुनें'}
+                </label>
+                <div className="mt-2 flex space-x-4">
+                  <div 
+                    className={`flex items-center p-2 border rounded-lg cursor-pointer ${role === 'user' ? 'bg-blue-50 border-blue-500' : 'border-gray-300'}`}
+                    onClick={() => setRole('user')}
+                  >
+                    <User className="w-5 h-5 mr-2 text-gray-700" />
+                    <span>{language === 'en' ? 'User' : 'उपयोगकर्ता'}</span>
+                  </div>
+                  <div 
+                    className={`flex items-center p-2 border rounded-lg cursor-pointer ${role === 'lawyer' ? 'bg-blue-50 border-blue-500' : 'border-gray-300'}`}
+                    onClick={() => setRole('lawyer')}
+                  >
+                    <Briefcase className="w-5 h-5 mr-2 text-gray-700" />
+                    <span>{language === 'en' ? 'Lawyer' : 'वकील'}</span>
+                  </div>
+                  <div 
+                    className={`flex items-center p-2 border rounded-lg cursor-pointer ${role === 'admin' ? 'bg-blue-50 border-blue-500' : 'border-gray-300'}`}
+                    onClick={() => setRole('admin')}
+                  >
+                    <ShieldCheck className="w-5 h-5 mr-2 text-gray-700" />
+                    <span>{language === 'en' ? 'Admin' : 'प्रशासक'}</span>
+                  </div>
                 </div>
               </div>
 

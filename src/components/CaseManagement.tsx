@@ -7,8 +7,10 @@ import {
   addLegalCase,
   addCaseDocument
 } from '../models/services';
-import { LegalCaseModel, CaseDocumentModel, CaseStatus } from '../models/index';
-import { FileText, Plus, Upload, Eye, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { CaseStatus } from '../models/index';
+import { FileText, Plus, Upload, Eye, Clock, CheckCircle, AlertTriangle, Download } from 'lucide-react';
+import { storage } from '../utils/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface CaseManagementProps {
   t: any;
@@ -107,9 +109,14 @@ export const CaseManagement: React.FC<CaseManagementProps> = ({ t, showToast }) 
     if (!selectedCase || !documentFile) return;
 
     try {
-      // In a real app, you would upload the file to Firebase Storage here
-      // and get the download URL
-      const fileUrl = 'https://example.com/placeholder-url';
+      // Create a reference to the file in Firebase Storage
+      const storageRef = ref(storage, `case-documents/${selectedCase}/${Date.now()}_${documentFile.name}`);
+      
+      // Upload the file to Firebase Storage
+      const uploadResult = await uploadBytes(storageRef, documentFile);
+      
+      // Get the download URL
+      const fileUrl = await getDownloadURL(uploadResult.ref);
       
       const newDocument = {
         fileName: documentName || documentFile.name,
@@ -393,10 +400,18 @@ export const CaseManagement: React.FC<CaseManagementProps> = ({ t, showToast }) 
                                     href={doc.fileUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 hover:text-blue-800 flex items-center"
+                                    className="text-blue-600 hover:text-blue-800 flex items-center mr-4"
                                   >
                                     <Eye className="w-4 h-4 mr-1" />
                                     {t.caseManagement.viewDocument}
+                                  </a>
+                                  <a
+                                    href={doc.fileUrl}
+                                    download={doc.fileName}
+                                    className="text-green-600 hover:text-green-800 flex items-center"
+                                  >
+                                    <Download className="w-4 h-4 mr-1" />
+                                    {t.caseManagement.downloadDocument || 'Download'}
                                   </a>
                                 </div>
                               </div>

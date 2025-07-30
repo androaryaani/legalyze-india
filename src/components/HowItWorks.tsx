@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, MessageSquare, FileEdit, UserCheck, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MessageSquare, FileEdit, UserCheck, Download, Database, Shield, Video } from 'lucide-react';
 
 interface HowItWorksProps {
   t: any;
@@ -12,7 +12,10 @@ const HowItWorks: React.FC<HowItWorksProps> = ({ t }) => {
     { icon: MessageSquare, title: t.howItWorks.step1.title, description: t.howItWorks.step1.description },
     { icon: FileEdit, title: t.howItWorks.step2.title, description: t.howItWorks.step2.description },
     { icon: UserCheck, title: t.howItWorks.step3.title, description: t.howItWorks.step3.description },
-    { icon: Download, title: t.howItWorks.step4.title, description: t.howItWorks.step4.description }
+    { icon: Download, title: t.howItWorks.step4.title, description: t.howItWorks.step4.description },
+    { icon: Database, title: "DigiLocker Integration", description: "Connect your DigiLocker to access and share government documents securely" },
+    { icon: Shield, title: "Legal Profile Creation", description: "Create your personalized legal profile for faster document generation" },
+    { icon: Video, title: "Video Consultation", description: "Connect with lawyers through secure video calls for personalized advice" }
   ];
 
   useEffect(() => {
@@ -38,6 +41,9 @@ const HowItWorks: React.FC<HowItWorksProps> = ({ t }) => {
           <h2 className="text-3xl lg:text-4xl font-bold font-serif text-black mb-4">
             {t.howItWorks.heading}
           </h2>
+          <p className="text-lg text-gray-700 font-sans max-w-2xl mx-auto">
+            Our platform combines AI technology with legal expertise to provide you with comprehensive legal solutions
+          </p>
         </div>
 
         <div className="relative bg-gray-50 rounded-2xl p-8 lg:p-12">

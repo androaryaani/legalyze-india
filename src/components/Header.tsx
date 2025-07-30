@@ -24,11 +24,11 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn, u
   }, []);
 
   const navItems = [
-    { label: t.header.nav.home, href: '#home' },
-    { label: t.header.nav.features, href: '#features' },
-    { label: t.header.nav.lawyers, href: '#lawyers' },
-    { label: t.header.nav.templates, href: '#templates' },
-    { label: t.header.nav.about, href: '#about' }
+    { label: t.header.nav.home, href: '/' },
+    { label: t.header.nav.features, href: '/#features' },
+    { label: t.header.nav.lawyers, href: '/#lawyers' },
+    { label: t.header.nav.templates, href: '/#templates' },
+    { label: t.header.nav.about, href: '/#about' }
   ];
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -81,10 +81,10 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn, u
             ) : (
               <>
                 <a href="/login" className="bg-black text-white px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all inline-block">
-                  Sign In
+                  {t.header.signIn}
                 </a>
                 <a href="/signup" className="border border-black text-black px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all inline-block">
-                  Sign Up
+                  {t.header.signUp}
                 </a>
               </>
             )}
@@ -122,7 +122,7 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn, u
               <a
                 key={index}
                 href={item.href}
-                className="block text-black hover:text-gray-600 transition-colors font-sans"
+                className="block text-black hover:text-gray-600 transition-colors font-sans py-2"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {item.label}
@@ -144,10 +144,10 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn, u
               ) : (
                 <>
                   <a href="/login" className="block w-full bg-black text-white px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all text-center">
-                    Sign In
+                    {t.header.signIn}
                   </a>
                   <a href="/signup" className="block w-full border border-black text-black px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all text-center">
-                    Sign Up
+                    {t.header.signUp}
                   </a>
                 </>
               )}

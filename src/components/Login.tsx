@@ -27,20 +27,51 @@ export const Login: React.FC = () => {
     setError('');
 
     if (!email || !password) {
-      setError('All fields are required');
+      setError(language[0] === 'en' ? 'All fields are required' : 'सभी फील्ड आवश्यक हैं');
       return;
     }
 
     try {
       const success = await login(email, password);
       if (success) {
-        navigate('/dashboard');
+        // Get user data from localStorage to determine role
+        const userData = localStorage.getItem('legalyze_user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          // Redirect based on user role
+          if (user.role === 'lawyer') {
+            navigate('/lawyer-dashboard');
+          } else if (user.role === 'admin') {
+            navigate('/admin-dashboard');
+          } else {
+            navigate('/dashboard'); // Default for regular users
+          }
+        } else {
+          navigate('/dashboard'); // Fallback if user data not found
+        }
       } else {
-        setError('Email or password is invalid');
+        // Check if the email is one of the test accounts
+        if (email === 'test_user@legalyze.in' || email === 'test_lawyer@legalyze.in' || email === 'test_admin@legalyze.in') {
+          setError(language[0] === 'en' ? 
+            'Make sure you have set up Firebase Authentication in the Firebase Console' : 
+            'सुनिश्चित करें कि आपने फायरबेस कंसोल में फायरबेस ऑथेंटिकेशन सेटअप किया है');
+        } else {
+          setError(language[0] === 'en' ? 'Email or password is invalid' : 'ईमेल या पासवर्ड अमान्य है');
+        }
       }
-    } catch (err) {
-      setError('An error occurred while logging in. Please try again later.');
+    } catch (err: any) {
       console.error('Login error:', err);
+      if (err.code === 'auth/invalid-credential') {
+        setError(language[0] === 'en' ? 'Invalid email or password' : 'अमान्य ईमेल या पासवर्ड');
+      } else if (err.code === 'auth/user-not-found') {
+        setError(language[0] === 'en' ? 'User not found' : 'उपयोगकर्ता नहीं मिला');
+      } else if (err.code === 'auth/wrong-password') {
+        setError(language[0] === 'en' ? 'Incorrect password' : 'गलत पासवर्ड');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError(language[0] === 'en' ? 'Too many failed login attempts. Please try again later.' : 'बहुत अधिक असफल लॉगिन प्रयास। कृपया बाद में पुन: प्रयास करें।');
+      } else {
+        setError(language[0] === 'en' ? 'An error occurred while logging in. Please try again later.' : 'लॉग इन करते समय एक त्रुटि हुई। कृपया बाद में पुन: प्रयास करें।');
+      }
     }
   };
 

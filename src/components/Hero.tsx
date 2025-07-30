@@ -53,7 +53,7 @@ const Hero: React.FC<HeroProps> = ({ t }) => {
             className="space-y-8"
           >
             <div className="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-2">
-              India's #1 Legal AI Platform 🇮🇳
+              India's #1 Legal AI Platform with DigiLocker Integration 🇮🇳
             </div>
             <h1 className="text-4xl lg:text-5xl font-bold font-serif text-black leading-tight">
               {t.hero.heading}
@@ -61,6 +61,26 @@ const Hero: React.FC<HeroProps> = ({ t }) => {
             <p className="text-lg text-gray-800 font-sans leading-relaxed">
               {t.hero.subtext}
             </p>
+            <ul className="space-y-2">
+              <li className="flex items-center space-x-2">
+                <div className="bg-green-100 p-1 rounded-full">
+                  <Shield className="w-4 h-4 text-green-600" />
+                </div>
+                <span className="text-gray-800">{t.hero.features.encryption}</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <div className="bg-blue-100 p-1 rounded-full">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                </div>
+                <span className="text-gray-800">{t.hero.features.verification}</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <div className="bg-purple-100 p-1 rounded-full">
+                  <Gavel className="w-4 h-4 text-purple-600" />
+                </div>
+                <span className="text-gray-800">{t.hero.features.connection}</span>
+              </li>
+            </ul>
             <div className="flex flex-wrap gap-4">
               <motion.button
                 onClick={handleStartQuery}
@@ -86,11 +106,15 @@ const Hero: React.FC<HeroProps> = ({ t }) => {
             <div className="flex items-center space-x-4 pt-4">
               <div className="flex items-center space-x-1">
                 <Shield className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-gray-600">Secure and Encrypted</span>
+                <span className="text-sm text-gray-600">{t.hero.features.encryption}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Scale className="w-4 h-4 text-blue-600" />
-                <span className="text-sm text-gray-600">Compliant with Indian Law</span>
+                <span className="text-sm text-gray-600">{t.hero.features.compliance}</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <FileText className="w-4 h-4 text-purple-600" />
+                <span className="text-sm text-gray-600">{t.hero.features.digilocker}</span>
               </div>
             </div>
           </motion.div>

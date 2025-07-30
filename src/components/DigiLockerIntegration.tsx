@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Database, Shield, FileText, Download, CheckCircle, AlertCircle } from 'lucide-react';
 
+
 interface DigiLockerIntegrationProps {
   t: any;
   isLoggedIn: boolean;
@@ -35,10 +36,13 @@ const DigiLockerIntegration: React.FC<DigiLockerIntegrationProps> = ({ t, isLogg
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold font-serif text-black mb-4">
-            DigiLocker Integration
+            {t.digiLocker.title}
           </h2>
-          <p className="text-lg text-gray-700 font-sans max-w-2xl mx-auto">
-            Connect your DigiLocker to automatically fetch government documents for better legal assistance
+          <p className="text-lg text-gray-700 font-sans max-w-2xl mx-auto mb-4">
+            {t.digiLocker.subtitle}
+          </p>
+          <p className="text-md text-gray-600 font-sans max-w-3xl mx-auto">
+            {t.digiLocker.description}
           </p>
         </div>
 
@@ -52,7 +56,7 @@ const DigiLockerIntegration: React.FC<DigiLockerIntegrationProps> = ({ t, isLogg
                   DigiLocker Status
                 </h3>
                 <p className="text-gray-600">
-                  {isConnected ? "Connected & Secure" : "Not Connected"}
+                  {isConnected ? t.digiLocker.connected + " & Secure" : t.digiLocker.notConnected}
                 </p>
               </div>
             </div>
@@ -63,8 +67,8 @@ const DigiLockerIntegration: React.FC<DigiLockerIntegrationProps> = ({ t, isLogg
                   <div className="flex items-center space-x-2">
                     <AlertCircle className="w-5 h-5 text-yellow-600" />
                     <p className="text-yellow-800 font-medium">
-                      Connect DigiLocker for enhanced AI assistance
-                    </p>
+                    {t.digiLocker.benefits.title}
+                  </p>
                   </div>
                 </div>
                 
@@ -73,12 +77,12 @@ const DigiLockerIntegration: React.FC<DigiLockerIntegrationProps> = ({ t, isLogg
                   disabled={!isLoggedIn}
                   className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-sans font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoggedIn ? "Connect DigiLocker" : "Login Required"}
+                  {isLoggedIn ? t.digiLocker.connect : t.digiLocker.loginRequired}
                 </button>
                 
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
                   <Shield className="w-4 h-4" />
-                  <span>256-bit SSL encryption ensures your data security</span>
+                  <span>{t.digiLocker.securityNote}</span>
                 </div>
               </div>
             ) : (
@@ -87,15 +91,17 @@ const DigiLockerIntegration: React.FC<DigiLockerIntegrationProps> = ({ t, isLogg
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-5 h-5 text-green-600" />
                     <p className="text-green-800 font-medium">
-                      DigiLocker connected successfully!
+                      {t.digiLocker.connected}!
                     </p>
                   </div>
                 </div>
                 
                 <div className="text-sm text-gray-600">
-                  <p>✅ AI can now access your documents for better legal advice</p>
-                  <p>✅ Automatic document verification for legal processes</p>
-                  <p>✅ Faster case analysis with your personal information</p>
+                  <p>✅ {t.digiLocker.connectedBenefits.b1}</p>
+                  <p>✅ {t.digiLocker.connectedBenefits.b2}</p>
+                  <p>✅ {t.digiLocker.connectedBenefits.b3}</p>
+                  <p>✅ {t.digiLocker.connectedBenefits.b4}</p>
+                  <p>✅ {t.digiLocker.connectedBenefits.b5}</p>
                 </div>
               </div>
             )}

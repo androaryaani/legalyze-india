@@ -102,7 +102,12 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/dashboard" element={<Dashboard t={t} />} />
+        <Route path="/dashboard" element={isLoggedIn ? (
+          userType === 'user' ? <Navigate to="/user-dashboard" /> :
+          userType === 'lawyer' ? <Navigate to="/lawyer-dashboard" /> :
+          userType === 'admin' ? <Navigate to="/admin-dashboard" /> :
+          <Dashboard t={t} />
+        ) : <Dashboard t={t} />} />
         
         {/* New routes for database schema components */}
         <Route path="/user-dashboard" element={

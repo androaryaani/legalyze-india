@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getAnalytics } from 'firebase/analytics';
@@ -17,6 +17,13 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+// Make sure email/password authentication is enabled in Firebase Console
+// Go to: Firebase Console -> Authentication -> Sign-in method -> Email/Password -> Enable
+
+// Set persistence to local to keep user logged in
+auth.setPersistence = auth.setPersistence || (() => Promise.resolve());
+
 const db = getFirestore(app);
 const storage = getStorage(app);
 

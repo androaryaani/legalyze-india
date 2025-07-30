@@ -447,12 +447,12 @@ export const AdminDashboard: React.FC = () => {
               </div>
               
               <div className="border border-gray-200 rounded-lg p-6">
-                <h4 className="text-md font-medium mb-4">एआई सेटिंग्स</h4>
+                <h4 className="text-md font-medium mb-4">न्यायGPT एआई सेटिंग्स</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between py-3 border-b border-gray-100">
                     <div>
-                      <h5 className="font-medium">एआई असिस्टेंट</h5>
-                      <p className="text-sm text-gray-500">एआई असिस्टेंट सक्षम करें</p>
+                      <h5 className="font-medium">न्यायGPT कानूनी सहायक</h5>
+                      <p className="text-sm text-gray-500">एआई कानूनी सहायक सक्षम करें</p>
                     </div>
                     <div className="relative inline-block w-12 h-6 rounded-full bg-blue-600">
                       <div className="absolute right-1 top-1 w-4 h-4 rounded-full bg-white"></div>
@@ -467,6 +467,55 @@ export const AdminDashboard: React.FC = () => {
                       <option>Claude</option>
                       <option>Gemini</option>
                     </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">एआई API कुंजी</label>
+                    <div className="flex">
+                      <input 
+                        type="password" 
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                        placeholder="sk-***********************"
+                      />
+                      <button className="px-3 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700">
+                        अपडेट करें
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">API कुंजी सुरक्षित रूप से संग्रहीत की जाएगी</p>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">उपयोगकर्ता रोल प्रॉम्प्ट</label>
+                    <textarea 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24" 
+                      placeholder="उपयोगकर्ता के लिए AI प्रॉम्प्ट यहां दर्ज करें..."
+                    ></textarea>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">वकील रोल प्रॉम्प्ट</label>
+                    <textarea 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24" 
+                      placeholder="वकील के लिए AI प्रॉम्प्ट यहां दर्ज करें..."
+                    ></textarea>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">एडमिन रोल प्रॉम्प्ट</label>
+                    <textarea 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24" 
+                      placeholder="एडमिन के लिए AI प्रॉम्प्ट यहां दर्ज करें..."
+                    ></textarea>
+                  </div>
+                  
+                  <div className="flex items-center justify-between py-3 border-t border-gray-100 mt-2">
+                    <div>
+                      <h5 className="font-medium">डेटाबेस एक्सेस</h5>
+                      <p className="text-sm text-gray-500">AI को उपयोगकर्ता और वकील डेटाबेस तक पहुंच दें</p>
+                    </div>
+                    <div className="relative inline-block w-12 h-6 rounded-full bg-blue-600">
+                      <div className="absolute right-1 top-1 w-4 h-4 rounded-full bg-white"></div>
+                    </div>
                   </div>
                 </div>
               </div>

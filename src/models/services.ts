@@ -114,9 +114,6 @@ export async function addLegalCase(caseData: Omit<LegalCaseModel, 'createdAt' | 
     createdAt: serverTimestamp() as Timestamp
   };
   
-  // Remove the string clientId and replace with reference
-  const { clientId, ...rest } = caseData;
-  
   return addDocument(legalCasesCollection, caseWithReferences as unknown as LegalCaseModel);
 }
 
@@ -189,9 +186,6 @@ export async function addCaseDocument(documentData: Omit<CaseDocumentModel, 'upl
     caseId: caseRef,
     uploadedAt: serverTimestamp() as Timestamp
   };
-  
-  // Remove the string caseId and replace with reference
-  const { caseId, ...rest } = documentData;
   
   return addDocument(caseDocumentsCollection, documentWithReferences as unknown as CaseDocumentModel);
 }
@@ -329,9 +323,6 @@ export async function addMessage(messageData: Omit<ConversationMessageModel, 'se
     sentAt: serverTimestamp() as Timestamp,
     isRead: false
   };
-  
-  // Remove the string IDs and replace with references
-  const { caseId, senderId, receiverId, ...rest } = messageData;
   
   return addDocument(conversationMessagesCollection, messageWithReferences as unknown as ConversationMessageModel);
 }

@@ -22,7 +22,10 @@ const FAQ: React.FC<FAQProps> = ({ t }) => {
     { question: t.faq.q3.question, answer: t.faq.q3.answer },
     { question: t.faq.q4.question, answer: t.faq.q4.answer },
     { question: t.faq.q5.question, answer: t.faq.q5.answer },
-    { question: t.faq.q6.question, answer: t.faq.q6.answer }
+    { question: t.faq.q6.question, answer: t.faq.q6.answer },
+    { question: t.faq.q7.question, answer: t.faq.q7.answer },
+    { question: t.faq.q8.question, answer: t.faq.q8.answer },
+    { question: t.faq.q9.question, answer: t.faq.q9.answer }
   ];
 
   return (
@@ -32,6 +35,9 @@ const FAQ: React.FC<FAQProps> = ({ t }) => {
           <h2 className="text-3xl lg:text-4xl font-bold font-serif text-black mb-4">
             {t.faq.heading}
           </h2>
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+            {t.language === 'en' ? 'Get answers to common questions about our platform, features, and legal services.' : 'हमारे प्लेटफॉर्म, फीचर्स और कानूनी सेवाओं के बारे में सामान्य प्रश्नों के उत्तर प्राप्त करें।'}
+          </p>
         </div>
 
         <div className="space-y-4">

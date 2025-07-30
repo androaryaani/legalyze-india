@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss/utilities';
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
 
 /* Custom animations */
 @keyframes fade-in-up {
@@ -20,6 +20,7 @@
     opacity: 0;
     transform: translateX(30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
