@@ -135,7 +135,7 @@ const Hero: React.FC<HeroProps> = ({ t }) => {
                 <motion.div variants={itemVariants} className="flex flex-col items-center space-y-4">
                   <div className="bg-blue-50 p-4 rounded-full">
                     <img 
-                      src="/Screenshot_2025-07-29_184828-removebg-preview copy.png" 
+                      src="/WhatsApp Image 2025-07-29 at 18.53.29_2c712bb9.jpg" 
                       alt="Legalyze Logo" 
                       className="w-16 h-16 object-contain"
                     />

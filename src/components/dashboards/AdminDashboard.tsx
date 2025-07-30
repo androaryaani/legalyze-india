@@ -1,136 +1,196 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Server, Database, Activity, AlertTriangle, CheckCircle, BarChart2, PieChart, TrendingUp, Search, Filter, ChevronDown, UserPlus, Settings, Shield, Download } from 'lucide-react';
+import { Users, FileText, Shield, TrendingUp, AlertTriangle, CheckCircle, UserCheck, Tag, Eye, UserX, Edit, Trash2, Search, UserPlus, Filter, Download, Settings, BarChart2, PieChart } from 'lucide-react';
 import { useAuth } from '../../utils/AuthContext';
+import { getAllUsers, getAllLegalCases, getAllSpecializations, addSpecialization } from '../../models/services';
+import { UserModel, LegalCaseModel, SpecializationModel } from '../../models/index';
 
-export const AdminDashboard: React.FC = () => {
+interface AdminDashboardProps {
+  t: any;
+  showToast: (message: string) => void;
+}
+
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({ t, showToast }) => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  
+  // Get language preference from localStorage
+  const language = useState<'en' | 'hi'>(() => {
+    const savedLanguage = localStorage.getItem('language');
+    return (savedLanguage === 'en' || savedLanguage === 'hi') ? savedLanguage : 'en';
+  });
+  
+  const [users, setUsers] = useState<UserModel[]>([]);
+  const [cases, setCases] = useState<LegalCaseModel[]>([]);
+  const [specializations, setSpecializations] = useState<SpecializationModel[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [showAddSpecializationForm, setShowAddSpecializationForm] = useState<boolean>(false);
+  const [newSpecializationName, setNewSpecializationName] = useState<string>('');
+  const [newSpecializationDescription, setNewSpecializationDescription] = useState<string>('');
 
-  // Mock data for admin dashboard
-  const platformStats = [
-    { id: 1, title: 'कुल उपयोगकर्ता', value: '5,234', change: '+12%', trend: 'up', icon: Users },
-    { id: 2, title: 'कुल वकील', value: '342', change: '+5%', trend: 'up', icon: Shield },
-    { id: 3, title: 'कुल दस्तावेज़', value: '18,453', change: '+8%', trend: 'up', icon: Database },
-    { id: 4, title: 'कुल परामर्श', value: '2,876', change: '+15%', trend: 'up', icon: Activity },
-  ];
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      fetchData();
+    }
+  }, [user]);
 
-  const systemStatus = [
-    { id: 1, service: 'मुख्य एपीआई', status: 'operational', uptime: '99.98%', lastIncident: '15 दिन पहले' },
-    { id: 2, service: 'डेटाबेस', status: 'operational', uptime: '99.95%', lastIncident: '8 दिन पहले' },
-    { id: 3, service: 'फाइल स्टोरेज', status: 'operational', uptime: '99.99%', lastIncident: '30 दिन पहले' },
-    { id: 4, service: 'एआई सर्विस', status: 'degraded', uptime: '98.75%', lastIncident: '2 दिन पहले' },
-    { id: 5, service: 'पेमेंट गेटवे', status: 'operational', uptime: '99.90%', lastIncident: '12 दिन पहले' },
-  ];
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [fetchedUsers, fetchedCases, fetchedSpecializations] = await Promise.all([
+        getAllUsers(),
+        getAllLegalCases(),
+        getAllSpecializations()
+      ]);
+      
+      setUsers(fetchedUsers);
+      setCases(fetchedCases);
+      setSpecializations(fetchedSpecializations);
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+      showToast(t.adminDashboard.errorFetchingData);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const recentUsers = [
-    { id: 1, name: 'अमित शर्मा', email: 'amit.sharma@example.com', role: 'user', status: 'active', joinDate: '2025-03-10', lastActive: '2025-03-15' },
-    { id: 2, name: 'प्रिया पटेल', email: 'priya.patel@example.com', role: 'lawyer', status: 'active', joinDate: '2025-03-08', lastActive: '2025-03-15' },
-    { id: 3, name: 'राहुल सिंह', email: 'rahul.singh@example.com', role: 'user', status: 'inactive', joinDate: '2025-03-05', lastActive: '2025-03-07' },
-    { id: 4, name: 'नेहा गुप्ता', email: 'neha.gupta@example.com', role: 'lawyer', status: 'pending', joinDate: '2025-03-12', lastActive: '2025-03-12' },
-    { id: 5, name: 'विकास जैन', email: 'vikas.jain@example.com', role: 'user', status: 'active', joinDate: '2025-03-11', lastActive: '2025-03-14' },
+  const handleAddSpecialization = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const newSpecialization = {
+        name: newSpecializationName,
+        description: newSpecializationDescription
+      };
+
+      await addSpecialization(newSpecialization);
+      showToast(t.adminDashboard.specializationAddedSuccess);
+      setNewSpecializationName('');
+      setNewSpecializationDescription('');
+      setShowAddSpecializationForm(false);
+      fetchData(); // Refresh data
+    } catch (error) {
+      console.error('Error adding specialization:', error);
+      showToast(t.adminDashboard.errorAddingSpecialization);
+    }
+  };
+
+  // Calculate stats from actual data
+  const lawyerCount = users.filter(user => user.userType === 'lawyer').length;
+  const userCount = users.filter(user => user.userType === 'user').length;
+  const caseCount = cases.length;
+  
+  const systemStats = [
+    { title: t.adminDashboard.totalUsers, value: userCount.toString(), icon: Users, change: '+12%' },
+    { title: t.adminDashboard.activeLawyers, value: lawyerCount.toString(), icon: Shield, change: '+8%' },
+    { title: t.adminDashboard.totalCases, value: caseCount.toString(), icon: FileText, change: '+24%' },
+    { title: t.adminDashboard.specializations, value: specializations.length.toString(), icon: Tag, change: '+18%' },
   ];
 
   const recentActivities = [
-    { id: 1, type: 'user_signup', user: 'नेहा गुप्ता', timestamp: '2025-03-15T14:30:00', details: 'नए वकील ने साइन अप किया' },
-    { id: 2, type: 'document_upload', user: 'अमित शर्मा', timestamp: '2025-03-15T13:45:00', details: 'नया दस्तावेज़ अपलोड किया गया' },
-    { id: 3, type: 'payment_received', user: 'प्रिया पटेल', timestamp: '2025-03-15T12:20:00', details: '₹5,000 का भुगतान प्राप्त हुआ' },
-    { id: 4, type: 'system_alert', user: 'सिस्टम', timestamp: '2025-03-15T10:15:00', details: 'एआई सर्विस में प्रदर्शन की समस्या' },
-    { id: 5, type: 'consultation_booked', user: 'राहुल सिंह', timestamp: '2025-03-15T09:30:00', details: 'नया परामर्श बुक किया गया' },
+    { id: '1', type: 'user_registration', message: t.adminDashboard.newUserRegistered.replace('{email}', 'john.doe@email.com'), time: t.adminDashboard.fiveMinutesAgo },
+    { id: '2', type: 'document_created', message: t.adminDashboard.legalNoticeCreated.replace('{userId}', '2847'), time: t.adminDashboard.twelveMinutesAgo },
+    { id: '3', type: 'lawyer_verification', message: t.adminDashboard.lawyerProfileVerified.replace('{name}', 'Adv. Priya Sharma'), time: t.adminDashboard.oneHourAgo },
+    { id: '4', type: 'subscription', message: t.adminDashboard.premiumSubscriptionActivated.replace('{email}', 'rahul.singh@email.com'), time: t.adminDashboard.twoHoursAgo },
+  ];
+
+  const pendingReviews = [
+    { id: '1', type: t.adminDashboard.lawyerApplication, name: 'Adv. Rajesh Kumar', status: 'pending' },
+    { id: '2', type: t.adminDashboard.contentReport, name: t.adminDashboard.inappropriateAIResponse, status: 'urgent' },
+    { id: '3', type: t.adminDashboard.userComplaint, name: t.adminDashboard.documentQualityIssue, status: 'pending' },
   ];
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'operational':
-        return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">चालू</span>;
+        return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">{t.adminDashboard.statusOperational}</span>;
       case 'degraded':
-        return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">धीमा</span>;
+        return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">{t.adminDashboard.statusDegraded}</span>;
       case 'down':
-        return <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">बंद</span>;
+        return <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">{t.adminDashboard.statusDown}</span>;
       case 'active':
-        return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">सक्रिय</span>;
+        return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">{t.adminDashboard.statusActive}</span>;
       case 'inactive':
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">निष्क्रिय</span>;
+        return <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">{t.adminDashboard.statusInactive}</span>;
       case 'pending':
-        return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">लंबित</span>;
+        return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">{t.adminDashboard.statusPending}</span>;
+      case 'urgent':
+        return <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">{t.adminDashboard.statusUrgent}</span>;
+      case 'completed':
+        return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{t.adminDashboard.statusCompleted}</span>;
       default:
         return <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">{status}</span>;
     }
   };
 
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'user_signup':
-        return <div className="bg-green-50 p-2 rounded-lg"><UserPlus className="w-5 h-5 text-green-600" /></div>;
-      case 'document_upload':
-        return <div className="bg-blue-50 p-2 rounded-lg"><Database className="w-5 h-5 text-blue-600" /></div>;
-      case 'payment_received':
-        return <div className="bg-purple-50 p-2 rounded-lg"><TrendingUp className="w-5 h-5 text-purple-600" /></div>;
-      case 'system_alert':
-        return <div className="bg-red-50 p-2 rounded-lg"><AlertTriangle className="w-5 h-5 text-red-600" /></div>;
-      case 'consultation_booked':
-        return <div className="bg-indigo-50 p-2 rounded-lg"><Users className="w-5 h-5 text-indigo-600" /></div>;
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return renderDashboard();
+      case 'users':
+        return renderUsers();
+      case 'cases':
+        return renderCases();
+      case 'specializations':
+        return renderSpecializations();
       default:
-        return <div className="bg-gray-50 p-2 rounded-lg"><Activity className="w-5 h-5 text-gray-600" /></div>;
+        return renderDashboard();
     }
   };
 
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return `${date.toLocaleDateString('hi-IN')} ${date.toLocaleTimeString('hi-IN')}`;
-  };
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {platformStats.map(stat => (
-                <motion.div 
-                  key={stat.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: stat.id * 0.1 }}
-                  className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <stat.icon className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <span className={`text-sm font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                      {stat.change}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold">{stat.value}</h3>
-                  <p className="text-sm text-gray-500">{stat.title}</p>
-                </motion.div>
-              ))}
-            </div>
+  const renderDashboard = () => {
+    return (
+      <div>
+        {/* Stats Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {systemStats.map((stat, index) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white p-6 rounded-lg shadow-md border border-gray-200"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{stat.title}</p>
+                  <p className="text-2xl font-bold text-black">{stat.value}</p>
+                  <p className="text-sm text-green-600">{stat.change} {t.adminDashboard.thisMonth}</p>
+                </div>
+                <stat.icon className="w-8 h-8 text-gray-600" />
+              </div>
+            </motion.div>
+          ))}
+        </div>
 
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+              className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8"
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold">सिस्टम स्टेटस</h3>
-                <button className="text-sm text-blue-600 hover:underline">विस्तृत रिपोर्ट</button>
+                <h3 className="text-lg font-bold">{t.adminDashboard.systemStatus}</h3>
+                <button className="text-sm text-blue-600 hover:underline">{t.adminDashboard.detailedReport}</button>
               </div>
               
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">सर्विस</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">स्टेटस</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">अपटाइम</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">अंतिम घटना</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.service}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.status}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.uptime}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.lastIncident}</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {systemStatus.map((service) => (
+                    {[
+                      { id: '1', service: 'API Service', status: 'operational', uptime: '99.9%', lastIncident: '30 days ago' },
+                      { id: '2', service: 'Database', status: 'operational', uptime: '99.8%', lastIncident: '14 days ago' },
+                      { id: '3', service: 'AI Service', status: 'degraded', uptime: '98.5%', lastIncident: '2 days ago' },
+                      { id: '4', service: 'Storage', status: 'operational', uptime: '99.9%', lastIncident: '45 days ago' }
+                    ].map((service) => (
                       <tr key={service.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -164,100 +224,106 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-bold">हाल की गतिविधियाँ</h3>
-                  <a href="#" className="text-sm text-blue-600 hover:underline">सभी देखें</a>
-                </div>
-                <div className="space-y-4">
-                  {recentActivities.map(activity => (
-                    <div key={activity.id} className="flex items-start space-x-4 p-4 hover:bg-gray-50 rounded-lg transition-colors">
-                      {getActivityIcon(activity.type)}
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium">{activity.user}</h4>
-                          <span className="text-xs text-gray-500">{formatTimestamp(activity.timestamp)}</span>
-                        </div>
-                        <p className="text-sm text-gray-500 mt-1">{activity.details}</p>
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Recent Activities */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-lg shadow-md border border-gray-200"
+          >
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">{t.adminDashboard.recentActivities}</h2>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {recentActivities.map((activity) => (
+                  <div key={activity.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-900">{activity.message}</p>
+                      <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Pending Reviews */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-lg shadow-md border border-gray-200"
+          >
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">{t.adminDashboard.pendingReviews}</h2>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {pendingReviews.map((review) => (
+                  <div key={review.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      {review.status === 'urgent' ? (
+                        <AlertTriangle className="w-5 h-5 text-red-500" />
+                      ) : (
+                        <CheckCircle className="w-5 h-5 text-yellow-500" />
+                      )}
+                      <div>
+                        <h4 className="font-medium text-gray-900">{review.type}</h4>
+                        <p className="text-sm text-gray-600">{review.name}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.7 }}
-                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-bold">त्वरित रिपोर्ट</h3>
-                  <div className="flex space-x-2">
-                    <button className="p-2 text-gray-500 hover:text-blue-600 border border-gray-200 rounded-lg">
-                      <Download className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-gray-500 hover:text-blue-600 border border-gray-200 rounded-lg">
-                      <Settings className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">उपयोगकर्ता वृद्धि</h4>
-                    <div className="h-40 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <p className="text-gray-500">यहां ग्राफ आएगा</p>
+                    <div className="flex space-x-2">
+                      <button className="bg-green-100 text-green-700 px-3 py-1 rounded text-xs hover:bg-green-200 transition-colors">
+                        {t.adminDashboard.approve}
+                      </button>
+                      <button className="bg-red-100 text-red-700 px-3 py-1 rounded text-xs hover:bg-red-200 transition-colors">
+                        {t.adminDashboard.reject}
+                      </button>
                     </div>
                   </div>
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">राजस्व अवलोकन</h4>
-                    <div className="h-40 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <p className="text-gray-500">यहां ग्राफ आएगा</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+                ))}
+              </div>
             </div>
+          </motion.div>
+        </div>
           </div>
         );
       case 'users':
         return (
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold">उपयोगकर्ता प्रबंधन</h3>
-              <div className="flex space-x-3">
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-md border border-gray-200">
+              <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">{t.adminDashboard.userManagement}</h2>
+                <div className="flex space-x-3">
                 <div className="relative">
                   <input 
                     type="text" 
-                    placeholder="उपयोगकर्ता खोजें..." 
+                    placeholder={t.adminDashboard.searchUsers} 
                     className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
                 </div>
                 <button className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center space-x-2">
                   <UserPlus className="w-4 h-4" />
-                  <span>नया उपयोगकर्ता</span>
+                  <span>{t.adminDashboard.newUser}</span>
                 </button>
               </div>
             </div>
             
-            <div className="overflow-x-auto">
+            <div className="p-6 overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">नाम</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ईमेल</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">भूमिका</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">स्थिति</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">शामिल हुए</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">अंतिम सक्रिय</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">कार्रवाई</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.name}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.email}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.role}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.status}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.joined}</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.lastActive}</th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.actions}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -271,9 +337,9 @@ export const AdminDashboard: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-500">
-                          {user.role === 'user' ? 'उपयोगकर्ता' : 
-                           user.role === 'lawyer' ? 'वकील' : 
-                           user.role === 'admin' ? 'प्रशासक' : user.role}
+                          {user.role === 'user' ? t.adminDashboard.userRole : 
+                           user.role === 'lawyer' ? t.adminDashboard.lawyerRole : 
+                           user.role === 'admin' ? t.adminDashboard.adminRole : user.role}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -286,9 +352,17 @@ export const AdminDashboard: React.FC = () => {
                         {user.lastActive}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="#" className="text-blue-600 hover:text-blue-900 mr-3">देखें</a>
-                        <a href="#" className="text-blue-600 hover:text-blue-900 mr-3">संपादित करें</a>
-                        <a href="#" className="text-red-600 hover:text-red-900">निलंबित करें</a>
+                        <div className="flex justify-end space-x-2">
+                          <button className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50">
+                            <Eye className="w-4 h-4" title={t.adminDashboard.view} />
+                          </button>
+                          <button className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50">
+                            <Edit className="w-4 h-4" title={t.adminDashboard.edit} />
+                          </button>
+                          <button className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50">
+                            <UserX className="w-4 h-4" title={t.adminDashboard.suspend} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -297,33 +371,191 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
         );
+      case 'cases':
+        return (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-md border border-gray-200">
+              <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">{t.adminDashboard.caseManagement}</h2>
+                <div className="flex space-x-3">
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      placeholder={t.adminDashboard.searchCases} 
+                      className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-6 overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.caseId}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.title}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.client}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.lawyer}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.status}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.createdAt}</th>
+                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.actions}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {cases.map(caseItem => (
+                      <tr key={caseItem.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{caseItem.id.substring(0, 8)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{caseItem.title}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{caseItem.clientName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{caseItem.lawyerName || '-'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getStatusBadge(caseItem.status)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(caseItem.createdAt).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end space-x-2">
+                            <button className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50">
+                              <Eye className="w-4 h-4" title={t.adminDashboard.view} />
+                            </button>
+                            <button className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50">
+                              <Edit className="w-4 h-4" title={t.adminDashboard.edit} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        );
+      case 'specializations':
+        return (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-md border border-gray-200">
+              <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">{t.adminDashboard.specializationManagement}</h2>
+                <button 
+                  onClick={() => setShowAddSpecializationForm(!showAddSpecializationForm)}
+                  className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center space-x-2"
+                >
+                  <Tag className="w-4 h-4" />
+                  <span>{t.adminDashboard.addSpecialization}</span>
+                </button>
+              </div>
+              
+              {showAddSpecializationForm && (
+                <div className="p-6 border-b border-gray-200 bg-gray-50">
+                  <form onSubmit={handleAddSpecialization} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t.adminDashboard.specializationName}</label>
+                      <input 
+                        type="text" 
+                        value={newSpecializationName}
+                        onChange={(e) => setNewSpecializationName(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t.adminDashboard.specializationDescription}</label>
+                      <textarea 
+                        value={newSpecializationDescription}
+                        onChange={(e) => setNewSpecializationDescription(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
+                        required
+                      ></textarea>
+                    </div>
+                    <div className="flex justify-end space-x-3">
+                      <button 
+                        type="button"
+                        onClick={() => setShowAddSpecializationForm(false)}
+                        className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                      >
+                        {t.adminDashboard.cancel}
+                      </button>
+                      <button 
+                        type="submit"
+                        className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                      >
+                        {t.adminDashboard.save}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+              
+              <div className="p-6 overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.name}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.description}</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.lawyersCount}</th>
+                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t.adminDashboard.actions}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {specializations.map(specialization => (
+                      <tr key={specialization.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{specialization.name}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-500">{specialization.description}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {users.filter(user => user.specializations?.includes(specialization.id)).length}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end space-x-2">
+                            <button className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50">
+                              <Edit className="w-4 h-4" title={t.adminDashboard.edit} />
+                            </button>
+                            <button className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50">
+                              <Trash2 className="w-4 h-4" title={t.adminDashboard.delete} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        );
       case 'analytics':
         return (
           <div className="space-y-8">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold">प्लेटफॉर्म एनालिटिक्स</h3>
+                <h3 className="text-lg font-bold">{t.adminDashboard.platformAnalytics}</h3>
                 <div className="flex space-x-2">
                   <button className="px-3 py-1 text-sm border border-gray-300 rounded-lg flex items-center space-x-1 hover:bg-gray-50">
                     <Filter className="w-4 h-4" />
-                    <span>फ़िल्टर</span>
+                    <span>{t.adminDashboard.filter}</span>
                   </button>
                   <button className="px-3 py-1 text-sm border border-gray-300 rounded-lg flex items-center space-x-1 hover:bg-gray-50">
                     <Download className="w-4 h-4" />
-                    <span>डाउनलोड</span>
+                    <span>{t.adminDashboard.download}</span>
                   </button>
                 </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">उपयोगकर्ता वृद्धि</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t.adminDashboard.userGrowth}</h4>
                   <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
                     <BarChart2 className="w-8 h-8 text-gray-400" />
                   </div>
                 </div>
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">उपयोगकर्ता वितरण</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t.adminDashboard.userDistribution}</h4>
                   <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
                     <PieChart className="w-8 h-8 text-gray-400" />
                   </div>
@@ -332,13 +564,13 @@ export const AdminDashboard: React.FC = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">दस्तावेज़ उपयोग</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t.adminDashboard.documentUsage}</h4>
                   <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
                     <BarChart2 className="w-8 h-8 text-gray-400" />
                   </div>
                 </div>
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">राजस्व रुझान</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t.adminDashboard.revenueTrends}</h4>
                   <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
                     <TrendingUp className="w-8 h-8 text-gray-400" />
                   </div>
@@ -347,11 +579,11 @@ export const AdminDashboard: React.FC = () => {
             </div>
             
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold mb-6">प्रदर्शन मेट्रिक्स</h3>
+              <h3 className="text-lg font-bold mb-6">{t.adminDashboard.performanceMetrics}</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">एपीआई प्रतिक्रिया समय</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t.adminDashboard.apiResponseTime}</h4>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold">245ms</span>
                     <span className="text-sm text-green-600">-12%</span>
@@ -360,16 +592,16 @@ export const AdminDashboard: React.FC = () => {
                 </div>
                 
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">सर्वर लोड</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t.adminDashboard.serverLoad}</h4>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold">42%</span>
-                    <span className="text-sm text-green-600">स्थिर</span>
+                    <span className="text-sm text-green-600">{t.adminDashboard.stable}</span>
                   </div>
                   <div className="mt-4 h-24 bg-gray-100 rounded-lg"></div>
                 </div>
                 
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">एआई प्रोसेसिंग</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t.adminDashboard.aiProcessing}</h4>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold">1.2s</span>
                     <span className="text-sm text-red-600">+8%</span>
@@ -383,16 +615,16 @@ export const AdminDashboard: React.FC = () => {
       case 'settings':
         return (
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold mb-6">सिस्टम सेटिंग्स</h3>
+            <h3 className="text-lg font-bold mb-6">{t.adminDashboard.systemSettings}</h3>
             
             <div className="space-y-6">
               <div className="border border-gray-200 rounded-lg p-6">
-                <h4 className="text-md font-medium mb-4">सामान्य सेटिंग्स</h4>
+                <h4 className="text-md font-medium mb-4">{t.adminDashboard.generalSettings}</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between py-3 border-b border-gray-100">
                     <div>
-                      <h5 className="font-medium">मेंटेनेंस मोड</h5>
-                      <p className="text-sm text-gray-500">प्लेटफॉर्म को मेंटेनेंस मोड में रखें</p>
+                      <h5 className="font-medium">{t.adminDashboard.maintenanceMode}</h5>
+                      <p className="text-sm text-gray-500">{t.adminDashboard.maintenanceModeDesc}</p>
                     </div>
                     <div className="relative inline-block w-12 h-6 rounded-full bg-gray-200">
                       <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-white"></div>
@@ -401,8 +633,8 @@ export const AdminDashboard: React.FC = () => {
                   
                   <div className="flex items-center justify-between py-3 border-b border-gray-100">
                     <div>
-                      <h5 className="font-medium">नए पंजीकरण</h5>
-                      <p className="text-sm text-gray-500">नए उपयोगकर्ता पंजीकरण की अनुमति दें</p>
+                      <h5 className="font-medium">{t.adminDashboard.newRegistrations}</h5>
+                      <p className="text-sm text-gray-500">{t.adminDashboard.newRegistrationsDesc}</p>
                     </div>
                     <div className="relative inline-block w-12 h-6 rounded-full bg-blue-600">
                       <div className="absolute right-1 top-1 w-4 h-4 rounded-full bg-white"></div>
@@ -411,8 +643,8 @@ export const AdminDashboard: React.FC = () => {
                   
                   <div className="flex items-center justify-between py-3 border-b border-gray-100">
                     <div>
-                      <h5 className="font-medium">डिबग मोड</h5>
-                      <p className="text-sm text-gray-500">विस्तृत लॉगिंग सक्षम करें</p>
+                      <h5 className="font-medium">{t.adminDashboard.debugMode}</h5>
+                      <p className="text-sm text-gray-500">{t.adminDashboard.debugModeDesc}</p>
                     </div>
                     <div className="relative inline-block w-12 h-6 rounded-full bg-gray-200">
                       <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-white"></div>
@@ -422,37 +654,37 @@ export const AdminDashboard: React.FC = () => {
               </div>
               
               <div className="border border-gray-200 rounded-lg p-6">
-                <h4 className="text-md font-medium mb-4">एपीआई सेटिंग्स</h4>
+                <h4 className="text-md font-medium mb-4">{t.adminDashboard.apiSettings}</h4>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">एपीआई रेट लिमिट</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.adminDashboard.apiRateLimit}</label>
                     <input 
                       type="number" 
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value="100"
                     />
-                    <p className="text-xs text-gray-500 mt-1">प्रति मिनट अनुरोधों की संख्या</p>
+                    <p className="text-xs text-gray-500 mt-1">{t.adminDashboard.requestsPerMinute}</p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">एपीआई टाइमआउट</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.adminDashboard.apiTimeout}</label>
                     <input 
                       type="number" 
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value="30"
                     />
-                    <p className="text-xs text-gray-500 mt-1">सेकंड में</p>
+                    <p className="text-xs text-gray-500 mt-1">{t.adminDashboard.inSeconds}</p>
                   </div>
                 </div>
               </div>
               
               <div className="border border-gray-200 rounded-lg p-6">
-                <h4 className="text-md font-medium mb-4">न्यायGPT एआई सेटिंग्स</h4>
+                <h4 className="text-md font-medium mb-4">{t.adminDashboard.nyayGPTSettings}</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between py-3 border-b border-gray-100">
                     <div>
-                      <h5 className="font-medium">न्यायGPT कानूनी सहायक</h5>
-                      <p className="text-sm text-gray-500">एआई कानूनी सहायक सक्षम करें</p>
+                      <h5 className="font-medium">{t.adminDashboard.nyayGPTLegalAssistant}</h5>
+                      <p className="text-sm text-gray-500">{t.adminDashboard.enableAILegalAssistant}</p>
                     </div>
                     <div className="relative inline-block w-12 h-6 rounded-full bg-blue-600">
                       <div className="absolute right-1 top-1 w-4 h-4 rounded-full bg-white"></div>
@@ -460,7 +692,7 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">एआई मॉडल</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.adminDashboard.aiModel}</label>
                     <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                       <option>GPT-4</option>
                       <option>GPT-3.5</option>
@@ -470,7 +702,7 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">एआई API कुंजी</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.adminDashboard.aiApiKey}</label>
                     <div className="flex">
                       <input 
                         type="password" 
@@ -478,40 +710,40 @@ export const AdminDashboard: React.FC = () => {
                         placeholder="sk-***********************"
                       />
                       <button className="px-3 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700">
-                        अपडेट करें
+                        {t.adminDashboard.update}
                       </button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">API कुंजी सुरक्षित रूप से संग्रहीत की जाएगी</p>
+                    <p className="text-xs text-gray-500 mt-1">{t.adminDashboard.apiKeySecurelyStored}</p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">उपयोगकर्ता रोल प्रॉम्प्ट</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.adminDashboard.userRolePrompt}</label>
                     <textarea 
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24" 
-                      placeholder="उपयोगकर्ता के लिए AI प्रॉम्प्ट यहां दर्ज करें..."
+                      placeholder={t.adminDashboard.enterUserAIPrompt}
                     ></textarea>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">वकील रोल प्रॉम्प्ट</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.adminDashboard.lawyerRolePrompt}</label>
                     <textarea 
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24" 
-                      placeholder="वकील के लिए AI प्रॉम्प्ट यहां दर्ज करें..."
+                      placeholder={t.adminDashboard.enterLawyerAIPrompt}
                     ></textarea>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">एडमिन रोल प्रॉम्प्ट</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.adminDashboard.adminRolePrompt}</label>
                     <textarea 
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24" 
-                      placeholder="एडमिन के लिए AI प्रॉम्प्ट यहां दर्ज करें..."
+                      placeholder={t.adminDashboard.enterAdminAIPrompt}
                     ></textarea>
                   </div>
                   
                   <div className="flex items-center justify-between py-3 border-t border-gray-100 mt-2">
                     <div>
-                      <h5 className="font-medium">डेटाबेस एक्सेस</h5>
-                      <p className="text-sm text-gray-500">AI को उपयोगकर्ता और वकील डेटाबेस तक पहुंच दें</p>
+                      <h5 className="font-medium">{t.adminDashboard.databaseAccess}</h5>
+                      <p className="text-sm text-gray-500">{t.adminDashboard.databaseAccessDesc}</p>
                     </div>
                     <div className="relative inline-block w-12 h-6 rounded-full bg-blue-600">
                       <div className="absolute right-1 top-1 w-4 h-4 rounded-full bg-white"></div>
@@ -522,10 +754,10 @@ export const AdminDashboard: React.FC = () => {
               
               <div className="flex justify-end space-x-3">
                 <button className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
-                  रीसेट करें
+                  {t.adminDashboard.reset}
                 </button>
                 <button className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-                  सेव करें
+                  {t.adminDashboard.save}
                 </button>
               </div>
             </div>
@@ -537,59 +769,112 @@ export const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8 flex justify-between items-center"
-      >
-        <div>
-          <h2 className="text-2xl font-bold mb-2">नमस्ते, {user?.name || 'प्रशासक'}</h2>
-          <p className="text-gray-600">प्लेटफॉर्म का अवलोकन यहां है</p>
+    <section className="w-full py-6">
+      {loading && (
+        <div className="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-        <div className="flex space-x-3">
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center space-x-2">
-            <Download className="w-4 h-4" />
-            <span>रिपोर्ट डाउनलोड करें</span>
-          </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center space-x-2">
-            <Settings className="w-4 h-4" />
-            <span>सिस्टम सेटिंग्स</span>
-          </button>
-        </div>
-      </motion.div>
+      )}
 
-      <div className="mb-8">
-        <nav className="flex space-x-1 overflow-x-auto pb-2">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeTab === 'overview' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+      <div className="container mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h2 className="text-3xl font-bold mb-2">{t.adminDashboard.heading}</h2>
+          <p className="text-gray-600">{t.adminDashboard.subheading}</p>
+        </motion.div>
+
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Sidebar Navigation */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="w-full md:w-64 flex-shrink-0"
           >
-            अवलोकन
-          </button>
-          <button
-            onClick={() => setActiveTab('users')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeTab === 'users' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900">{user?.displayName || t.adminDashboard.admin}</h3>
+                    <p className="text-sm text-gray-500">{t.adminDashboard.adminRole}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-2">
+                <nav className="space-y-1">
+                  <button
+                    onClick={() => setActiveTab('dashboard')}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 text-sm rounded-lg ${activeTab === 'dashboard' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                  >
+                    <TrendingUp className="w-5 h-5" />
+                    <span>{t.adminDashboard.dashboard}</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('users')}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 text-sm rounded-lg ${activeTab === 'users' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                  >
+                    <Users className="w-5 h-5" />
+                    <span>{t.adminDashboard.users}</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('cases')}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 text-sm rounded-lg ${activeTab === 'cases' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                  >
+                    <FileText className="w-5 h-5" />
+                    <span>{t.adminDashboard.cases}</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('specializations')}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 text-sm rounded-lg ${activeTab === 'specializations' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                  >
+                    <Tag className="w-5 h-5" />
+                    <span>{t.adminDashboard.specializations}</span>
+                  </button>
+                </nav>
+              </div>
+
+              <div className="p-4 border-t border-gray-200">
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">{t.adminDashboard.totalUsers}</span>
+                      <span className="text-sm font-medium">{users.length}</span>
+                    </div>
+                    <div className="w-full h-2 bg-gray-100 rounded-full mt-1">
+                      <div className="h-full bg-blue-500 rounded-full" style={{ width: '75%' }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">{t.adminDashboard.activeCases}</span>
+                      <span className="text-sm font-medium">{cases.filter(c => c.status === 'active').length}</span>
+                    </div>
+                    <div className="w-full h-2 bg-gray-100 rounded-full mt-1">
+                      <div className="h-full bg-green-500 rounded-full" style={{ width: '60%' }}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Main Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex-1"
           >
-            उपयोगकर्ता
-          </button>
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeTab === 'analytics' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-          >
-            एनालिटिक्स
-          </button>
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeTab === 'settings' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-          >
-            सेटिंग्स
-          </button>
-        </nav>
+            {renderTabContent()}
+          </motion.div>
+        </div>
       </div>
-
-      {renderTabContent()}
-    </div>
+    </section>
   );
 };
 

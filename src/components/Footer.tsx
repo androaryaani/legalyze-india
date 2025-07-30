@@ -13,7 +13,7 @@ const Footer: React.FC<FooterProps> = ({ t }) => {
           <div>
             <div className="flex items-center space-x-3 mb-6">
               <img 
-                src="/Screenshot_2025-07-29_184828-removebg-preview copy.png" 
+                src="/WhatsApp Image 2025-07-29 at 18.53.29_2c712bb9.jpg" 
                 alt="Legalyze-India Logo" 
                 className="w-12 h-12"
               />

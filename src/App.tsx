@@ -31,9 +31,9 @@ import { UserRole } from './types';
 import { CaseManagement } from './components/CaseManagement';
 import { SpecializationManagement } from './components/SpecializationManagement';
 import { ConversationManager } from './components/ConversationManager';
-import { LawyerDashboard } from './components/LawyerDashboard';
-import { UserDashboard } from './components/UserDashboard';
-import { AdminDashboard } from './components/AdminDashboard';
+import { LawyerDashboard } from './components/dashboards/LawyerDashboard';
+import { UserDashboard } from './components/dashboards/UserDashboard';
+import { AdminDashboard } from './components/dashboards/AdminDashboard';
 
 // Define a type that extends UserRole to include 'main' for non-logged in users
 type UserType = UserRole | 'main';

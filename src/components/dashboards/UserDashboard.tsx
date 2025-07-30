@@ -1,82 +1,150 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { FileText, Calendar, Upload, Download, Clock, AlertTriangle, CheckCircle, Search } from 'lucide-react';
 import { useAuth } from '../../utils/AuthContext';
-import { translations } from '../../utils/translations';
-import { Scale } from 'lucide-react';
+import { getLegalCasesByClientId, updateUser } from '../../models/services';
+import { LegalCaseModel } from '../../models/index';
+import CaseManagement from '../CaseManagement';
+import { User, Settings, FileText, Search } from 'lucide-react';
 
-export const UserDashboard: React.FC = () => {
+interface UserDashboardProps {
+  t: any;
+  showToast: (message: string) => void;
+}
+
+export const UserDashboard: React.FC<UserDashboardProps> = ({ t, showToast }) => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
-  
-  // Get language preference from localStorage
-  const [language, setLanguage] = useState<'en' | 'hi'>(() => {
-    const savedLanguage = localStorage.getItem('language');
-    return (savedLanguage === 'en' || savedLanguage === 'hi') ? savedLanguage : 'en';
-  });
-  
-  // Update language if localStorage changes
+  const [activeTab, setActiveTab] = useState<string>('cases');
+  const [cases, setCases] = useState<LegalCaseModel[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [profileData, setProfileData] = useState<{
+    displayName: string;
+    bio: string;
+    contactNumber: string;
+  }>({ displayName: '', bio: '', contactNumber: '' });
+
   useEffect(() => {
-    const handleStorageChange = () => {
-      const savedLanguage = localStorage.getItem('language') as 'en' | 'hi' | null;
-      if (savedLanguage === 'en' || savedLanguage === 'hi') {
-        setLanguage(savedLanguage);
-      }
-    };
+    if (user) {
+      fetchCases();
+      // Initialize profile data
+      setProfileData({
+        displayName: user.displayName || '',
+        bio: user.bio || '',
+        contactNumber: user.contactNumber || ''
+      });
+    }
+  }, [user]);
+
+  const fetchCases = async () => {
+    if (!user) return;
     
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    setLoading(true);
+    try {
+      const fetchedCases = await getLegalCasesByClientId(user.id);
+      setCases(fetchedCases);
+    } catch (error) {
+      console.error('Error fetching cases:', error);
+      showToast(t.userDashboard.errorFetchingCases);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Mock data for user dashboard
-  const recentDocuments = [
-    { id: 1, title: 'Legal Notice', type: 'legal_notice', status: 'pending_review', date: '2025-03-15', icon: FileText },
-    { id: 2, title: 'RTI Application', type: 'rti', status: 'completed', date: '2025-03-10', icon: FileText },
-    { id: 3, title: 'Property Documents', type: 'property', status: 'in_progress', date: '2025-03-05', icon: FileText },
-  ];
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
 
-  const upcomingConsultations = [
-    { id: 1, lawyer: 'Advocate Sharma', date: '2025-03-20', time: '14:00', type: 'video', status: 'confirmed' },
-    { id: 2, lawyer: 'Advocate Patel', date: '2025-03-25', time: '11:30', type: 'office', status: 'pending' },
-  ];
+    try {
+      await updateUser(user.id, {
+        displayName: profileData.displayName,
+        bio: profileData.bio,
+        contactNumber: profileData.contactNumber,
+        updatedAt: new Date()
+      });
+      showToast(t.userDashboard.profileUpdatedSuccess);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      showToast(t.userDashboard.errorUpdatingProfile);
+    }
+  };
 
-  const caseUpdates = [
-    { id: 1, title: 'Property Dispute', court: 'Delhi High Court', nextDate: '2025-04-10', status: 'hearing_scheduled' },
-    { id: 2, title: 'Consumer Complaint', court: 'Consumer Forum', nextDate: '2025-03-28', status: 'documents_required' },
-  ];
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pending_review':
-        return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">
-          {language === 'en' ? 'Pending Review' : 'समीक्षा के लिए लंबित'}
-        </span>;
-      case 'completed':
-        return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-          {language === 'en' ? 'Completed' : 'पूर्ण'}
-        </span>;
-      case 'in_progress':
-        return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-          {language === 'en' ? 'In Progress' : 'प्रगति पर'}
-        </span>;
-      case 'confirmed':
-        return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-          {language === 'en' ? 'Confirmed' : 'पुष्टि की गई'}
-        </span>;
-      case 'pending':
-        return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">
-          {language === 'en' ? 'Pending' : 'लंबित'}
-        </span>;
-      case 'hearing_scheduled':
-        return <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">
-          {language === 'en' ? 'Hearing Scheduled' : 'सुनवाई निर्धारित'}
-        </span>;
-      case 'documents_required':
-        return <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
-          {language === 'en' ? 'Documents Required' : 'दस्तावेज़ आवश्यक'}
-        </span>;
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'cases':
+        return <CaseManagement t={t} showToast={showToast} />;
+      case 'find-lawyer':
+        return (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold mb-6">{t.userDashboard.findLawyer}</h3>
+            <div className="mb-6">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder={t.userDashboard.searchBySpecialization}
+                  className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <Search className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
+              </div>
+            </div>
+            
+            <div className="text-center py-8">
+              <p className="text-gray-600">{t.userDashboard.lawyerSearchPlaceholder}</p>
+              <p className="text-gray-500 text-sm mt-2">{t.userDashboard.lawyerSearchDescription}</p>
+            </div>
+          </div>
+        );
+      case 'profile':
+        return (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold mb-6">{t.userDashboard.profileSettings}</h3>
+            <form onSubmit={handleProfileUpdate}>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2" htmlFor="display-name">
+                  {t.userDashboard.displayName}
+                </label>
+                <input
+                  id="display-name"
+                  type="text"
+                  value={profileData.displayName}
+                  onChange={(e) => setProfileData({ ...profileData, displayName: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2" htmlFor="contact-number">
+                  {t.userDashboard.contactNumber}
+                </label>
+                <input
+                  id="contact-number"
+                  type="tel"
+                  value={profileData.contactNumber}
+                  onChange={(e) => setProfileData({ ...profileData, contactNumber: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-gray-700 mb-2" htmlFor="bio">
+                  {t.userDashboard.bio}
+                </label>
+                <textarea
+                  id="bio"
+                  value={profileData.bio}
+                  onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+                ></textarea>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  {t.userDashboard.saveChanges}
+                </button>
+              </div>
+            </form>
+          </div>
+        );
       default:
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">{status}</span>;
+        return null;
     }
   };
 
@@ -276,46 +344,101 @@ export const UserDashboard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <h2 className="text-2xl font-bold mb-2">{language === 'en' ? `Hello, ${user?.name || 'User'}` : `नमस्ते, ${user?.name || 'उपयोगकर्ता'}`}</h2>
-        <p className="text-gray-600">{language === 'en' ? 'Here is an overview of your legal matters' : 'यहां आपके कानूनी मामलों का एक अवलोकन है'}</p>
-      </motion.div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          <h1 className="text-3xl font-bold text-gray-900">{t.userDashboard.heading}</h1>
+          <p className="text-gray-600">{t.userDashboard.welcome.replace('{name}', user?.displayName || 'User')}</p>
+        </motion.div>
 
-      <div className="mb-8">
-        <nav className="flex space-x-1 overflow-x-auto pb-2">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeTab === 'overview' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-          >
-            {language === 'en' ? 'Overview' : 'अवलोकन'}
-          </button>
-          <button
-            onClick={() => setActiveTab('documents')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeTab === 'documents' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-          >
-            {language === 'en' ? 'Documents' : 'दस्तावेज़'}
-          </button>
-          <button
-            onClick={() => setActiveTab('consultations')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeTab === 'consultations' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-          >
-            {language === 'en' ? 'Consultations' : 'परामर्श'}
-          </button>
-          <button
-            onClick={() => setActiveTab('cases')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeTab === 'cases' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-          >
-            {language === 'en' ? 'Cases' : 'केस'}
-          </button>
-        </nav>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                  <User className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium">{user?.displayName || 'User'}</h3>
+                  <p className="text-sm text-gray-500">{user?.email}</p>
+                </div>
+              </div>
+              <nav>
+                <ul className="space-y-2">
+                  <li>
+                    <button
+                      onClick={() => setActiveTab('cases')}
+                      className={`w-full text-left px-4 py-2 rounded-md flex items-center ${activeTab === 'cases' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                    >
+                      <FileText className="w-5 h-5 mr-3" />
+                      {t.userDashboard.myCases}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => setActiveTab('find-lawyer')}
+                      className={`w-full text-left px-4 py-2 rounded-md flex items-center ${activeTab === 'find-lawyer' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                    >
+                      <Search className="w-5 h-5 mr-3" />
+                      {t.userDashboard.findLawyer}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => setActiveTab('profile')}
+                      className={`w-full text-left px-4 py-2 rounded-md flex items-center ${activeTab === 'profile' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                    >
+                      <Settings className="w-5 h-5 mr-3" />
+                      {t.userDashboard.profileSettings}
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="font-medium mb-4">{t.userDashboard.caseStatistics}</h3>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm text-gray-600">{t.userDashboard.activeCases}</span>
+                    <span className="text-sm font-medium">{cases.filter(c => c.status !== 'completed').length}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${(cases.filter(c => c.status !== 'completed').length / Math.max(cases.length, 1)) * 100}%` }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm text-gray-600">{t.userDashboard.completedCases}</span>
+                    <span className="text-sm font-medium">{cases.filter(c => c.status === 'completed').length}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: `${(cases.filter(c => c.status === 'completed').length / Math.max(cases.length, 1)) * 100}%` }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : (
+              renderTabContent()
+            )}
+          </div>
+        </div>
       </div>
-
-      {renderTabContent()}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../utils/AuthContext';
 import { UserDashboard } from './dashboards/UserDashboard';
@@ -61,11 +61,11 @@ const Dashboard: React.FC<DashboardProps> = ({ t }) => {
 
     switch (user.role) {
       case 'lawyer':
-        return <LawyerDashboard />;
+        return <LawyerDashboard t={localT} showToast={(msg: string) => alert(msg)} />;
       case 'admin':
-        return <AdminDashboard />;
+        return <AdminDashboard t={localT} showToast={(msg: string) => alert(msg)} />;
       default:
-        return <UserDashboard />;
+        return <UserDashboard t={localT} showToast={(msg: string) => alert(msg)} />;
     }
   };
 

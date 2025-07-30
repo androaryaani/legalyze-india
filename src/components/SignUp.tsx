@@ -29,6 +29,13 @@ export const SignUp: React.FC = () => {
   // Get translations based on language
   const t = translations[language];
 
+  // Function to toggle language
+  const toggleLanguage = () => {
+    const newLanguage = language === 'en' ? 'hi' : 'en';
+    setLanguage(newLanguage);
+    localStorage.setItem('language', newLanguage);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -112,7 +119,7 @@ export const SignUp: React.FC = () => {
             className="flex justify-center"
           >
             <img 
-              src="/Screenshot_2025-07-29_184828-removebg-preview.png" 
+              src="/WhatsApp Image 2025-07-29 at 18.53.29_2c712bb9.jpg" 
               alt="Legalyze Logo" 
               className="h-20 w-auto"
             />

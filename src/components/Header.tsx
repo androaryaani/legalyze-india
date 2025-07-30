@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn, u
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img 
-            src="/Screenshot_2025-07-29_184828-removebg-preview copy.png" 
+            src="/WhatsApp Image 2025-07-29 at 18.53.29_2c712bb9.jpg" 
             alt="Legalyze-India Logo" 
             className="w-14 h-14"
           />
@@ -146,7 +146,7 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage, t, isLoggedIn, u
                   <a href="/login" className="block w-full bg-black text-white px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all text-center">
                     {t.header.signIn}
                   </a>
-                  <a href="/signup" className="block w-full border border-black text-black px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all text-center">
+                  <a href="/signup" className="block w-full border border-black text-black px-4 py-2 rounded text-sm font-sans hover:scale-105 transition-all text-center mt-2">
                     {t.header.signUp}
                   </a>
                 </>

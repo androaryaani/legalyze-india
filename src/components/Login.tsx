@@ -14,20 +14,27 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
   
   // Get language preference from localStorage
-  const language = useState<'en' | 'hi'>(() => {
+  const [language, setLanguage] = useState<'en' | 'hi'>(() => {
     const savedLanguage = localStorage.getItem('language');
     return (savedLanguage === 'en' || savedLanguage === 'hi') ? savedLanguage : 'en';
   });
   
   // Get translations based on language
-  const t = translations[language[0]];
+  const t = translations[language];
+  
+  // Function to toggle language
+  const toggleLanguage = () => {
+    const newLanguage = language === 'en' ? 'hi' : 'en';
+    setLanguage(newLanguage);
+    localStorage.setItem('language', newLanguage);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (!email || !password) {
-      setError(language[0] === 'en' ? 'All fields are required' : 'सभी फील्ड आवश्यक हैं');
+      setError(language === 'en' ? 'All fields are required' : 'सभी फील्ड आवश्यक हैं');
       return;
     }
 
@@ -52,25 +59,25 @@ export const Login: React.FC = () => {
       } else {
         // Check if the email is one of the test accounts
         if (email === 'test_user@legalyze.in' || email === 'test_lawyer@legalyze.in' || email === 'test_admin@legalyze.in') {
-          setError(language[0] === 'en' ? 
+          setError(language === 'en' ? 
             'Make sure you have set up Firebase Authentication in the Firebase Console' : 
             'सुनिश्चित करें कि आपने फायरबेस कंसोल में फायरबेस ऑथेंटिकेशन सेटअप किया है');
         } else {
-          setError(language[0] === 'en' ? 'Email or password is invalid' : 'ईमेल या पासवर्ड अमान्य है');
+          setError(language === 'en' ? 'Email or password is invalid' : 'ईमेल या पासवर्ड अमान्य है');
         }
       }
     } catch (err: any) {
       console.error('Login error:', err);
       if (err.code === 'auth/invalid-credential') {
-        setError(language[0] === 'en' ? 'Invalid email or password' : 'अमान्य ईमेल या पासवर्ड');
+        setError(language === 'en' ? 'Invalid email or password' : 'अमान्य ईमेल या पासवर्ड');
       } else if (err.code === 'auth/user-not-found') {
-        setError(language[0] === 'en' ? 'User not found' : 'उपयोगकर्ता नहीं मिला');
+        setError(language === 'en' ? 'User not found' : 'उपयोगकर्ता नहीं मिला');
       } else if (err.code === 'auth/wrong-password') {
-        setError(language[0] === 'en' ? 'Incorrect password' : 'गलत पासवर्ड');
+        setError(language === 'en' ? 'Incorrect password' : 'गलत पासवर्ड');
       } else if (err.code === 'auth/too-many-requests') {
-        setError(language[0] === 'en' ? 'Too many failed login attempts. Please try again later.' : 'बहुत अधिक असफल लॉगिन प्रयास। कृपया बाद में पुन: प्रयास करें।');
+        setError(language === 'en' ? 'Too many failed login attempts. Please try again later.' : 'बहुत अधिक असफल लॉगिन प्रयास। कृपया बाद में पुन: प्रयास करें।');
       } else {
-        setError(language[0] === 'en' ? 'An error occurred while logging in. Please try again later.' : 'लॉग इन करते समय एक त्रुटि हुई। कृपया बाद में पुन: प्रयास करें।');
+        setError(language === 'en' ? 'An error occurred while logging in. Please try again later.' : 'लॉग इन करते समय एक त्रुटि हुई। कृपया बाद में पुन: प्रयास करें।');
       }
     }
   };
@@ -95,7 +102,7 @@ export const Login: React.FC = () => {
             className="flex justify-center"
           >
             <img 
-              src="/Screenshot_2025-07-29_184828-removebg-preview.png" 
+              src="/WhatsApp Image 2025-07-29 at 18.53.29_2c712bb9.jpg" 
               alt="Legalyze Logo" 
               className="h-20 w-auto"
             />
