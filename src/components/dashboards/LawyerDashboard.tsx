@@ -68,7 +68,7 @@ export const LawyerDashboard: React.FC<LawyerDashboardProps> = ({ t, showToast }
   };
       lastUpdated: '2025-03-08'
     },
-  ];
+  ];*/
 
   const upcomingConsultations = [
     { 

@@ -143,13 +143,6 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ t, showToast }) =>
             </form>
           </div>
         );
-      default:
-        return null;
-    }
-  };
-
-  const renderTabContent = () => {
-    switch (activeTab) {
       case 'overview':
         return (
           <div className="grid md:grid-cols-2 gap-8">
